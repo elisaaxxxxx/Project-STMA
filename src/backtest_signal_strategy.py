@@ -1,0 +1,140 @@
+"""
+Backtest a 0/1 trading signal with transaction costs.
+
+Ce script utilise la configuration centralisée pour :
+- Calculer les rendements avec les coûts de transaction configurés
+- Analyser les performances selon les paramètres configurés
+- Sauvegarder dans les dossiers configurés
+
+Les paramètres sont définis dans project_config.py
+"""
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from pathlib import Path
+import sys
+import os
+
+# Importer la configuration
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from project_config import (TICKERS, START_DATE, END_DATE, TRANSACTION_COST, 
+                           TRADING_DAYS_PER_YEAR, RESULTS_DIR, 
+                           get_signals_file_path, get_backtest_file_path,
+                           print_config, validate_config)
+
+def compute_metrics(r):
+    r = r.dropna()
+    if len(r) == 0:
+        return {"CAGR": np.nan, "Vol": np.nan, "Sharpe": np.nan, "MaxDD": np.nan}
+    n = len(r)
+    cagr = (np.prod(1 + r)) ** (TRADING_DAYS_PER_YEAR / n) - 1
+    vol = r.std(ddof=0) * np.sqrt(TRADING_DAYS_PER_YEAR)
+    sharpe = np.sqrt(TRADING_DAYS_PER_YEAR) * r.mean() / r.std(ddof=0) if r.std(ddof=0) > 0 else np.nan
+    eq = (1 + r).cumprod()
+    maxdd = (eq / eq.cummax() - 1).min()
+    return {"CAGR": cagr, "Vol": vol, "Sharpe": sharpe, "MaxDD": maxdd}
+
+def backtest_signal(df, cost=None):
+    if cost is None:
+        cost = TRANSACTION_COST
+    
+    print("\n--- Backtest Step A: Compute daily returns ---")
+    df = df.copy()
+    df["Return"] = df["Close"].pct_change().fillna(0.0)
+    print(df[["Date", "Close", "Return"]].head(3).to_string(index=False, float_format=lambda x: f'{x:.6f}'))
+
+    print("\n--- Step B: Position from signal (shifted, no look-ahead) ---")
+    df["Position"] = df["Signal_combined"].shift(1).fillna(0.0)
+    print(df[["Date", "Signal_combined", "Position"]].head(5).to_string(index=False, float_format=lambda x: f'{x:.1f}'))
+
+    print("\n--- Step C: Trade detection & transaction costs ---")
+    df["Trade"] = (df["Position"] != df["Position"].shift(1)).astype(int)
+    print(df[["Date", "Position", "Trade"]].head(7).to_string(index=False, float_format=lambda x: f'{x:.0f}'))
+    print(f"Transaction cost per trade: {cost:.4f}")
+
+    print("\n--- Step D: Strategy returns (gross and net) ---")
+    df["StratRetGross"] = df["Position"] * df["Return"]
+    df["StratRetNet"] = df["StratRetGross"] - df["Trade"] * cost
+    print(df[["Date", "Return", "StratRetGross", "StratRetNet"]].head(7).to_string(index=False, float_format=lambda x: f'{x:.6f}'))
+
+    print("\n--- Step E: Equity curves ---")
+    df["Equity"] = (1 + df["StratRetNet"]).cumprod()
+    df["BH_Equity"] = (1 + df["Return"]).cumprod()
+    print(df[["Date", "Equity", "BH_Equity"]].head(7).to_string(index=False, float_format=lambda x: f'{x:.6f}'))
+
+    return df
+
+
+def run_for_ticker(ticker):
+    print(f"\n{'='*30}\nProcessing {ticker}\n{'='*30}")
+    
+    # Utilise les chemins configurés
+    input_path = Path(get_signals_file_path(ticker))
+    results_dir = Path(RESULTS_DIR)
+    results_dir.mkdir(parents=True, exist_ok=True)
+    output_path = Path(get_backtest_file_path(ticker))
+    plot_path = results_dir / f"{ticker}_{START_DATE}_{END_DATE}_backtest_plot.png"
+
+    # Load data
+    print(f"Loading data from {input_path}")
+    df = pd.read_csv(input_path, parse_dates=["Date"])
+    if "Signal_combined" not in df.columns:
+        # Try Combined_Signal as int string (e.g. '1000' -> 1 if any 1 else 0)
+        if "Combined_Signal" in df.columns:
+            df["Signal_combined"] = df["Combined_Signal"].apply(lambda x: 1 if "1" in str(x) else 0)
+        else:
+            raise ValueError("No Signal_combined or Combined_Signal column found.")
+
+    # Backtest
+    df_bt = backtest_signal(df)
+
+    # Metrics
+    strat_metrics = compute_metrics(df_bt["StratRetNet"])
+    bh_metrics = compute_metrics(df_bt["Return"])
+
+    # Save results
+    df_bt.to_csv(output_path, index=False)
+    print(f"\n✓ Results saved to {output_path}")
+    
+    print("\n" + "="*60)
+    print("PERFORMANCE METRICS")
+    print("="*60)
+    
+    print("\n{:<25} {:>15} {:>15}".format("Metric", "Strategy", "Buy & Hold"))
+    print("-" * 60)
+    print("{:<25} {:>14.2%} {:>14.2%}".format("CAGR", strat_metrics["CAGR"], bh_metrics["CAGR"]))
+    print("{:<25} {:>14.2%} {:>14.2%}".format("Volatility (Ann.)", strat_metrics["Vol"], bh_metrics["Vol"]))
+    print("{:<25} {:>14.2f} {:>14.2f}".format("Sharpe Ratio", strat_metrics["Sharpe"], bh_metrics["Sharpe"]))
+    print("{:<25} {:>14.2%} {:>14.2%}".format("Max Drawdown", strat_metrics["MaxDD"], bh_metrics["MaxDD"]))
+    print("="*60)
+
+    # Plot
+    plt.figure(figsize=(10,6))
+    plt.plot(df_bt["Date"], df_bt["Equity"], label="Strategy")
+    plt.plot(df_bt["Date"], df_bt["BH_Equity"], label="Buy & Hold", linestyle="--")
+    plt.title(f"Equity Curve: {ticker} Strategy vs Buy & Hold")
+    plt.xlabel("Date")
+    plt.ylabel("Equity (Growth of $1)")
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.savefig(plot_path)
+    print(f"Plot saved to {plot_path}\n")
+
+def main():
+    # Validation de la configuration
+    is_valid, errors = validate_config()
+    if not is_valid:
+        print("❌ Erreurs de configuration :")
+        for error in errors:
+            print(f"  - {error}")
+        return
+    
+    print_config()
+    
+    # Utilise les tickers configurés
+    for ticker in TICKERS:
+        run_for_ticker(ticker)
+
+if __name__ == "__main__":
+    main()
