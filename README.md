@@ -158,5 +158,3 @@ AAPL   | Buy & Hold                |  25.10% |   0.65 | -81.80% | Benchmark
 ---
 
 *Créé par Elisa - Novembre 2025* 🚀
-
-Mathieu est trop fort 
