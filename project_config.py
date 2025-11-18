@@ -71,11 +71,8 @@ TEST_MONTHS = 6  # 6 mois
 # Nouvelle structure : séparer programmes et données
 DATA_RAW_DIR = 'data/raw'                    # Données brutes (CSV téléchargés)
 DATA_PROCESSED_DIR = 'data/processed'        # Données avec MA et signaux  
-DATA_FEATURES_DIR = 'data/features'          # Features engineering pour ML
-DATA_PREDICTIONS_DIR = 'data/predictions'    # Prédictions ML
 RESULTS_BACKTEST_DIR = 'data/results/backtest'     # Résultats des backtests
 RESULTS_VARIATIONS_DIR = 'data/results/variations'  # Tests de variations
-ML_MODELS_DIR = 'ml/models'                  # Modèles ML sauvegardés
 
 # Anciens noms pour compatibilité (DEPRECATED)
 DATA_DIR = DATA_RAW_DIR
@@ -152,59 +149,6 @@ def validate_config():
         errors.append("TRANSACTION_COST doit être entre 0 et 1")
     
     return len(errors) == 0, errors
-
-# ===== PARAMÈTRES MACHINE LEARNING =====
-# Horizons de prédiction (jours dans le futur)
-PREDICTION_HORIZONS = [1, 5, 10, 20]  # 1 jour, 1 semaine, 2 semaines, 1 mois
-
-# Features techniques à calculer
-TECHNICAL_FEATURES = [
-    'returns_1d', 'returns_5d', 'returns_20d',         # Rendements
-    'volatility_20d', 'volatility_60d',                # Volatilité
-    'rsi_14', 'rsi_30',                                # RSI
-    'bb_upper', 'bb_lower', 'bb_pct',                  # Bollinger Bands
-    'macd', 'macd_signal', 'macd_hist',               # MACD
-    'volume_sma_20', 'volume_ratio',                   # Volume
-    'price_momentum_10', 'price_momentum_30',          # Momentum
-]
-
-# Modèles à tester
-ML_MODELS = [
-    'random_forest',
-    'xgboost', 
-    'linear_regression',
-    'svm',
-    'neural_network'
-]
-
-# Paramètres d'entraînement
-ML_TRAIN_SIZE = 0.8  # 80% pour l'entraînement
-ML_VALIDATION_SIZE = 0.1  # 10% pour la validation
-ML_TEST_SIZE = 0.1  # 10% pour le test
-
-# Fenêtre glissante pour l'entraînement (jours)
-ML_ROLLING_WINDOW = 252 * 2  # 2 ans de données
-
-# Fonctions utilitaires ML
-def get_features_file_path(ticker, start_date=None, end_date=None):
-    """Génère le chemin vers le fichier de features."""
-    if start_date is None:
-        start_date = START_DATE
-    if end_date is None:
-        end_date = END_DATE
-    return f"{DATA_FEATURES_DIR}/{ticker}_{start_date}_{end_date}_features.csv"
-
-def get_predictions_file_path(ticker, model_name, horizon, start_date=None, end_date=None):
-    """Génère le chemin vers le fichier de prédictions."""
-    if start_date is None:
-        start_date = START_DATE
-    if end_date is None:
-        end_date = END_DATE
-    return f"{DATA_PREDICTIONS_DIR}/{ticker}_{model_name}_h{horizon}_{start_date}_{end_date}_predictions.csv"
-
-def get_model_file_path(ticker, model_name, horizon):
-    """Génère le chemin vers le modèle sauvegardé."""
-    return f"{ML_MODELS_DIR}/{ticker}_{model_name}_h{horizon}.pkl"
 
 # Validation automatique à l'import
 if __name__ == "__main__":
