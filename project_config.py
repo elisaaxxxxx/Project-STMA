@@ -69,10 +69,10 @@ TEST_MONTHS = 6  # 6 mois
 
 # ===== RÉPERTOIRES =====
 # Nouvelle structure : séparer programmes et données
-DATA_RAW_DIR = 'data/raw'                    # Données brutes (CSV téléchargés)
-DATA_PROCESSED_DIR = 'data/processed'        # Données avec MA et signaux  
-RESULTS_BACKTEST_DIR = 'data/results/backtest'     # Résultats des backtests
-RESULTS_VARIATIONS_DIR = 'data/results/variations'  # Tests de variations
+DATA_RAW_DIR = 'PROJECT/data/raw'                    # Données brutes (CSV téléchargés)
+DATA_PROCESSED_DIR = 'PROJECT/data/processed'        # Données avec MA et signaux  
+RESULTS_BACKTEST_DIR = 'PROJECT/data/results/backtest'     # Résultats des backtests
+RESULTS_VARIATIONS_DIR = 'PROJECT/data/results/variations'  # Tests de variations
 
 # Anciens noms pour compatibilité (DEPRECATED)
 DATA_DIR = DATA_RAW_DIR
