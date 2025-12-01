@@ -1,0 +1,14 @@
+name: trading-ml-project
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.13
+  - pandas
+  - numpy
+  - matplotlib
+  - scikit-learn
+  - joblib
+  - pip
+  - pip:
+    - yfinance
