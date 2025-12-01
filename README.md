@@ -345,10 +345,55 @@ EXTREMES:
    - Train R² (0.93%) < Test R² (1.12%)
    - Negative overfitting gap confirms model generalizes well
 
-3. **🎯 Automatic Feature Selection:**
-   - Lasso reduces features from 21 → 4 automatically
-   - Keeps only most predictive features
-   - Prevents overfitting through sparsity
+3. **🎯 Automatic Feature Selection - The 4 Selected Features:**
+   
+   Lasso reduces features from 21 → 4 automatically, keeping only the most predictive variables.
+   
+   ```
+   ┌──────────────────────────────────────────────────────────────────────────┐
+   │                    🏆 SELECTED FEATURES (Ranked by Importance)          │
+   ├──────────────────────────────────────────────────────────────────────────┤
+   │                                                                          │
+   │  1️⃣  signal_t                                    Coefficient: +0.002893 │
+   │      📈 MA-Specific Feature                                             │
+   │      → Current trading signal (-1, 0, +1)                               │
+   │      → MOST IMPORTANT: 5× larger than 2nd feature                       │
+   │                                                                          │
+   │  2️⃣  spy_ret_20d                                 Coefficient: +0.000593 │
+   │      🌐 Global Market Feature                                           │
+   │      → SPY 20-day return                                                │
+   │      → Captures market regime (bull/bear context)                       │
+   │                                                                          │
+   │  3️⃣  ma_short_t                                  Coefficient: -0.000201 │
+   │      📈 MA-Specific Feature                                             │
+   │      → Short moving average value at time t                             │
+   │      → Negative sign suggests mean reversion effect                     │
+   │                                                                          │
+   │  4️⃣  spy_ret_5d                                  Coefficient: +0.000134 │
+   │      🌐 Global Market Feature                                           │
+   │      → SPY 5-day return                                                 │
+   │      → Short-term market momentum indicator                             │
+   │                                                                          │
+   └──────────────────────────────────────────────────────────────────────────┘
+   
+   📊 Feature Composition:
+      • 2 MA-Specific features (50%)  → Strategy mechanics
+      • 2 Global Market features (50%) → Market context
+      • 0 MA Parameters              → Window sizes don't matter
+   
+   🚫 Eliminated: 17 features (81% reduction)
+      → All volatility features (vol_20d, spy_vol_20d, spy_autocorr_1d)
+      → All volume features (volume_20d_avg, volume_ratio)
+      → Most momentum features (momentum_1m, momentum_3m, ret_1d, ret_5d, ret_20d)
+      → Other MA features (ma_long_t, ma_diff_t, ma_ratio_t)
+      → MA parameters (short_window, long_window)
+   
+   💡 Model Strategy:
+      ✓ Trust the signal itself (signal_t is king!)
+      ✓ Check market regime (SPY returns matter)
+      ✓ Ignore noise (volatility, volume don't help)
+      ✓ Keep it simple (4 features beat 21)
+   ```
 
 4. **📈 4-Panel Visualization Shows:**
    - **Top-Left**: R² vs α (main plot showing peak at optimal α)
