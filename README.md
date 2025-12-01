@@ -345,55 +345,33 @@ EXTREMES:
    - Train R² (0.93%) < Test R² (1.12%)
    - Negative overfitting gap confirms model generalizes well
 
-3. **🎯 Automatic Feature Selection - The 4 Selected Features:**
+3. **Automatic Feature Selection - The 4 Selected Features:**
    
    Lasso reduces features from 21 → 4 automatically, keeping only the most predictive variables.
    
-   ```
-   ┌──────────────────────────────────────────────────────────────────────────┐
-   │                    🏆 SELECTED FEATURES (Ranked by Importance)          │
-   ├──────────────────────────────────────────────────────────────────────────┤
-   │                                                                          │
-   │  1️⃣  signal_t                                    Coefficient: +0.002893 │
-   │      📈 MA-Specific Feature                                             │
-   │      → Current trading signal (-1, 0, +1)                               │
-   │      → MOST IMPORTANT: 5× larger than 2nd feature                       │
-   │                                                                          │
-   │  2️⃣  spy_ret_20d                                 Coefficient: +0.000593 │
-   │      🌐 Global Market Feature                                           │
-   │      → SPY 20-day return                                                │
-   │      → Captures market regime (bull/bear context)                       │
-   │                                                                          │
-   │  3️⃣  ma_short_t                                  Coefficient: -0.000201 │
-   │      📈 MA-Specific Feature                                             │
-   │      → Short moving average value at time t                             │
-   │      → Negative sign suggests mean reversion effect                     │
-   │                                                                          │
-   │  4️⃣  spy_ret_5d                                  Coefficient: +0.000134 │
-   │      🌐 Global Market Feature                                           │
-   │      → SPY 5-day return                                                 │
-   │      → Short-term market momentum indicator                             │
-   │                                                                          │
-   └──────────────────────────────────────────────────────────────────────────┘
+   **Selected Features (Ranked by Importance):**
    
-   📊 Feature Composition:
-      • 2 MA-Specific features (50%)  → Strategy mechanics
-      • 2 Global Market features (50%) → Market context
-      • 0 MA Parameters              → Window sizes don't matter
+   1. **`signal_t`** (MA-Specific) — Coefficient: **+0.002893**
+      - Current trading signal (-1, 0, +1)
+      - Most important feature: 5× larger coefficient than others
    
-   🚫 Eliminated: 17 features (81% reduction)
-      → All volatility features (vol_20d, spy_vol_20d, spy_autocorr_1d)
-      → All volume features (volume_20d_avg, volume_ratio)
-      → Most momentum features (momentum_1m, momentum_3m, ret_1d, ret_5d, ret_20d)
-      → Other MA features (ma_long_t, ma_diff_t, ma_ratio_t)
-      → MA parameters (short_window, long_window)
+   2. **`spy_ret_20d`** (Market) — Coefficient: +0.000593
+      - SPY 20-day return
+      - Captures market regime (bull/bear context)
    
-   💡 Model Strategy:
-      ✓ Trust the signal itself (signal_t is king!)
-      ✓ Check market regime (SPY returns matter)
-      ✓ Ignore noise (volatility, volume don't help)
-      ✓ Keep it simple (4 features beat 21)
-   ```
+   3. **`ma_short_t`** (MA-Specific) — Coefficient: -0.000201
+      - Short moving average value at time t
+      - Negative sign suggests mean reversion effect
+   
+   4. **`spy_ret_5d`** (Market) — Coefficient: +0.000134
+      - SPY 5-day return
+      - Short-term market momentum indicator
+   
+   **Key Insights:**
+   - Signal dominates: `signal_t` is the most predictive feature
+   - Market context matters: Both SPY features selected (market regime + momentum)
+   - 17 features eliminated: All volatility, volume, and MA parameters dropped
+   - Simplicity wins: 4 carefully selected features outperform using all 21
 
 4. **📈 4-Panel Visualization Shows:**
    - **Top-Left**: R² vs α (main plot showing peak at optimal α)
