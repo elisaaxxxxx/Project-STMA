@@ -31,13 +31,30 @@ from project_config import (TICKERS, START_DATE, END_DATE, print_config,
                            validate_config, get_data_file_path)
 
 def check_data_files():
-    """Vérifie si les fichiers de données existent."""
+    """Vérifie si les fichiers de données existent et propose de les télécharger."""
     missing_files = []
+    missing_tickers = []
     
     for ticker in TICKERS:
         data_file = get_data_file_path(ticker)
         if not Path(data_file).exists():
             missing_files.append(data_file)
+            missing_tickers.append(ticker)
+    
+    if missing_tickers:
+        print(f"\n⚠️  DONNÉES MANQUANTES pour: {', '.join(missing_tickers)}")
+        print("📥 Téléchargement automatique des données manquantes...")
+        
+        # Import et exécution automatique du data loader
+        try:
+            sys.path.append(str(Path(__file__).parent / "src"))
+            import data_loader
+            data_loader.main()
+            print("✅ Données téléchargées avec succès!")
+            return []  # Plus de fichiers manquants après téléchargement
+        except Exception as e:
+            print(f"❌ Erreur lors du téléchargement: {e}")
+            return missing_files
     
     return missing_files
 
@@ -101,23 +118,21 @@ def run_signal_variations():
         print(f"❌ Erreur lors du test des variations: {e}")
         return False
 
+
+
 def run_full_pipeline():
     """Exécute le pipeline complet."""
     print("🚀 DÉMARRAGE DU PIPELINE COMPLET")
     print_config()
     
-    # Vérification des fichiers de données
+    # Vérification et téléchargement automatique des fichiers de données manquants
     missing_files = check_data_files()
     if missing_files:
-        print("\n⚠️  FICHIERS DE DONNÉES MANQUANTS:")
+        print(f"\n❌ Impossible de télécharger certaines données:")
         for file in missing_files:
             print(f"  - {file}")
-        print("\n💡 Pour télécharger les données, utilisez le script data_loader.py")
-        print("   ou placez les fichiers CSV dans le dossier Data/src/")
-        
-        response = input("\nContinuer quand même? (y/N): ").strip().lower()
-        if response != 'y':
-            return False
+        print("\n💡 Vérifiez votre connexion internet et les noms des tickers")
+        return False
     
     # Exécution séquentielle
     steps = [
@@ -166,17 +181,18 @@ Exemples:
     )
     
     parser.add_argument('--all', action='store_true', 
-                       help='Exécuter le pipeline complet')
-    parser.add_argument('--config', action='store_true',
-                       help='Afficher la configuration actuelle')
-    parser.add_argument('--ma', action='store_true',
-                       help='Calculer les moyennes mobiles')
-    parser.add_argument('--signals', action='store_true',
-                       help='Générer les signaux de trading')
-    parser.add_argument('--backtest', action='store_true',
-                       help='Exécuter les backtests')
-    parser.add_argument('--variations', action='store_true',
-                       help='Tester les variations de signaux')
+                       help='Exécute tout le pipeline complet')
+    parser.add_argument('--config', action='store_true', 
+                       help='Affiche la configuration actuelle')
+    parser.add_argument('--ma', action='store_true', 
+                       help='Calcule les moyennes mobiles')
+    parser.add_argument('--signals', action='store_true', 
+                       help='Génère les signaux de trading')
+    parser.add_argument('--backtest', action='store_true', 
+                       help='Effectue les backtests')
+    parser.add_argument('--variations', action='store_true', 
+                       help='Test les variations de signaux')
+
     
     args = parser.parse_args()
     
@@ -184,7 +200,7 @@ Exemples:
     if not any(vars(args).values()):
         print("\n🎯 PIPELINE DE STRATÉGIE DE TRADING")
         print_config()
-        print("\nOptions disponibles:")
+        print("Options disponibles:")
         print("1. Exécuter le pipeline complet")
         print("2. Calculer les moyennes mobiles")
         print("3. Générer les signaux")
@@ -235,6 +251,7 @@ Exemples:
     if args.all:
         success = run_full_pipeline()
     else:
+        # Pipeline traditionnel
         if args.ma:
             success &= run_moving_averages()
         if args.signals:

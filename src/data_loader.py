@@ -158,20 +158,32 @@ class DataLoader:
 def _parse_args():
     """Parse CLI arguments for quick use from the command line."""
     import argparse
+    
+    # Récupérer les valeurs actuelles de la configuration (après rechargement éventuel)
+    current_tickers = ','.join(TICKERS)
+    current_start = START_DATE
+    current_end = END_DATE
 
     parser = argparse.ArgumentParser(description='Download and save OHLCV data using yfinance')
     # Accept either a single ticker or a comma-separated list.
     # For backward compatibility we accept --ticker and --tickers (same dest).
     parser.add_argument('--ticker', '--tickers', '-t', dest='tickers',
-                        default=','.join(TICKERS),
-                        help=f'Ticker or comma-separated tickers to download (config: {",".join(TICKERS)})')
-    parser.add_argument('--start', '-s', default=START_DATE, help=f'Start date YYYY-MM-DD (config: {START_DATE})')
-    parser.add_argument('--end', '-e', default=END_DATE, help=f'End date YYYY-MM-DD (config: {END_DATE})')
+                        default=current_tickers,
+                        help=f'Ticker or comma-separated tickers to download (config: {current_tickers})')
+    parser.add_argument('--start', '-s', default=current_start, help=f'Start date YYYY-MM-DD (config: {current_start})')
+    parser.add_argument('--end', '-e', default=current_end, help=f'End date YYYY-MM-DD (config: {current_end})')
     parser.add_argument('--path', '-p', default=None, help='Directory to save CSV (default: configured data/raw/)')
     return parser.parse_args()
 
 
 if __name__ == '__main__':
+    # Force reload de la configuration pour éviter les problèmes de cache
+    import importlib
+    if 'project_config' in sys.modules:
+        importlib.reload(sys.modules['project_config'])
+        # Re-importer les variables après rechargement
+        from project_config import TICKERS, START_DATE, END_DATE, get_data_file_path, print_config, validate_config
+    
     # Valider la configuration
     is_valid, errors = validate_config()
     if not is_valid:

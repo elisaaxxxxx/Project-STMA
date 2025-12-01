@@ -10,11 +10,11 @@ Tous les scripts utiliseront automatiquement ces paramètres.
 
 # ===== TICKERS À ANALYSER =====
 # Liste des actions à analyser
-TICKERS = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'NVDA', 'TSLA']
+TICKERS = ['AAPL', 'SPY']
 
 # Exemples d'autres tickers intéressants à tester :
 # Actions tech (FAANG+) :
-# TICKERS = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'NVDA', 'TSLA']
+# TICKERS = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'NVDA', 'TSLA', 'SPY']
 
 # ETFs diversifiés :
 # TICKERS = ['SPY', 'QQQ', 'IWM', 'VTI', 'DIA', 'EFA', 'VWO']
@@ -69,10 +69,10 @@ TEST_MONTHS = 6  # 6 mois
 
 # ===== RÉPERTOIRES =====
 # Nouvelle structure : séparer programmes et données
-DATA_RAW_DIR = 'PROJECT/data/raw'                    # Données brutes (CSV téléchargés)
-DATA_PROCESSED_DIR = 'PROJECT/data/processed'        # Données avec MA et signaux  
-RESULTS_BACKTEST_DIR = 'PROJECT/data/results/backtest'     # Résultats des backtests
-RESULTS_VARIATIONS_DIR = 'PROJECT/data/results/variations'  # Tests de variations
+DATA_RAW_DIR = 'data/raw'                    # Données brutes (CSV téléchargés)
+DATA_PROCESSED_DIR = 'data/processed'        # Données avec MA et signaux  
+RESULTS_BACKTEST_DIR = 'data/results/backtest'     # Résultats des backtests
+RESULTS_VARIATIONS_DIR = 'data/results/variations'  # Tests de variations
 
 # Anciens noms pour compatibilité (DEPRECATED)
 DATA_DIR = DATA_RAW_DIR
@@ -150,14 +150,214 @@ def validate_config():
     
     return len(errors) == 0, errors
 
+# ===== FONCTIONS DE GESTION DE CONFIGURATION =====
+
+def update_tickers(new_tickers):
+    """Met à jour la liste des tickers dans le fichier de configuration."""
+    import os
+    import shutil
+    
+    print(f"🔄 Mise à jour des tickers: {new_tickers}")
+    
+    # Lire le fichier
+    with open('project_config.py', 'r') as f:
+        content = f.read()
+    
+    # Construire la nouvelle ligne TICKERS
+    tickers_list = [f"'{ticker.strip()}'" for ticker in new_tickers]
+    new_tickers_line = f"TICKERS = [{', '.join(tickers_list)}]"
+    
+    # Remplacer la ligne TICKERS
+    lines = content.split('\n')
+    for i, line in enumerate(lines):
+        if line.strip().startswith('TICKERS = [') and not line.strip().startswith('#'):
+            lines[i] = new_tickers_line
+            break
+    
+    # Sauvegarder
+    with open('project_config.py', 'w') as f:
+        f.write('\n'.join(lines))
+    
+    # Nettoyer le cache
+    clear_cache()
+    
+    # Vérifier quelles données manquent et proposer le téléchargement
+    check_and_download_missing_data(new_tickers)
+    
+    print("✅ Tickers mis à jour!")
+
+def check_and_download_missing_data(tickers):
+    """Vérifie et télécharge automatiquement les données manquantes."""
+    import os
+    import sys
+    from pathlib import Path
+    
+    missing_tickers = []
+    
+    # Vérifier quels fichiers manquent
+    for ticker in tickers:
+        data_file = f"data/raw/{ticker}_{START_DATE}_{END_DATE}.csv"
+        if not os.path.exists(data_file):
+            missing_tickers.append(ticker)
+    
+    if missing_tickers:
+        print(f"\n📥 Données manquantes pour: {', '.join(missing_tickers)}")
+        print("🔄 Téléchargement automatique en cours...")
+        
+        try:
+            # Lancer le data_loader via subprocess pour éviter les problèmes d'import
+            import subprocess
+            result = subprocess.run([
+                sys.executable, 'src/data_loader.py'
+            ], cwd='.', capture_output=True, text=True)
+            
+            if result.returncode == 0:
+                print("✅ Données téléchargées avec succès!")
+                
+                # Traitement automatique complet pour les nouvelles données
+                print("🔄 Traitement automatique des nouvelles données...")
+                
+                # Calcul des moyennes mobiles
+                ma_result = subprocess.run([
+                    sys.executable, 'run_pipeline.py', '--ma'
+                ], cwd='.', capture_output=True, text=True)
+                
+                if ma_result.returncode == 0:
+                    print("✅ Moyennes mobiles calculées!")
+                    
+                    # Génération des signaux
+                    signals_result = subprocess.run([
+                        sys.executable, 'run_pipeline.py', '--signals'
+                    ], cwd='.', capture_output=True, text=True)
+                    
+                    if signals_result.returncode == 0:
+                        print("✅ Signaux générés!")
+                        print("🎉 Nouvelles données complètement traitées!")
+                    else:
+                        print("⚠️  Erreur génération signaux, mais données téléchargées")
+                else:
+                    print("⚠️  Erreur calcul MA, mais données téléchargées")
+                    
+            else:
+                print(f"❌ Erreur lors du téléchargement: {result.stderr}")
+                print("💡 Vous pouvez télécharger manuellement avec: python src/data_loader.py")
+            
+        except Exception as e:
+            print(f"❌ Erreur lors du téléchargement: {e}")
+            print("💡 Vous pouvez télécharger manuellement avec: python src/data_loader.py")
+    else:
+        print("✅ Toutes les données sont disponibles!")
+
+def update_dates(start_date, end_date):
+    """Met à jour les dates dans le fichier de configuration."""
+    print(f"🔄 Mise à jour des dates: {start_date} → {end_date}")
+    
+    # Lire le fichier
+    with open('project_config.py', 'r') as f:
+        content = f.read()
+    
+    # Remplacer les dates
+    lines = content.split('\n')
+    for i, line in enumerate(lines):
+        if line.strip().startswith('START_DATE = ') and not line.strip().startswith('#'):
+            lines[i] = f"START_DATE = '{start_date}'"
+        elif line.strip().startswith('END_DATE = ') and not line.strip().startswith('#'):
+            lines[i] = f"END_DATE = '{end_date}'"
+    
+    # Sauvegarder
+    with open('project_config.py', 'w') as f:
+        f.write('\n'.join(lines))
+    
+    # Nettoyer le cache
+    clear_cache()
+    print("✅ Dates mises à jour!")
+
+def clear_cache():
+    """Nettoie les caches Python pour forcer le rechargement."""
+    import os
+    import shutil
+    import sys
+    
+    print("🧹 Nettoyage des caches Python...")
+    
+    # Supprimer __pycache__
+    cache_dirs = ['__pycache__', 'src/__pycache__']
+    for cache_dir in cache_dirs:
+        if os.path.exists(cache_dir):
+            shutil.rmtree(cache_dir)
+            print(f"   Supprimé: {cache_dir}")
+    
+    # Supprimer le module des modules chargés
+    if 'project_config' in sys.modules:
+        del sys.modules['project_config']
+        print("   Module project_config rechargé")
+
+def manage_config():
+    """Interface interactive pour gérer la configuration."""
+    import sys
+    
+    if len(sys.argv) == 1:
+        # Mode interactif
+        print("\n🎛️  GESTIONNAIRE DE CONFIGURATION")
+        print("="*50)
+        print("1. Afficher la configuration actuelle")
+        print("2. Modifier les tickers")
+        print("3. Modifier les dates")
+        print("4. Nettoyer les caches")
+        print("5. Quitter")
+        
+        while True:
+            try:
+                choice = input("\nChoisissez une option (1-5): ").strip()
+                
+                if choice == '1':
+                    print_config()
+                elif choice == '2':
+                    current_tickers = ', '.join(TICKERS)
+                    print(f"Tickers actuels: {current_tickers}")
+                    new_tickers = input("Nouveaux tickers (séparés par virgules): ").strip()
+                    if new_tickers:
+                        tickers = [t.strip().upper() for t in new_tickers.split(',')]
+                        update_tickers(tickers)
+                elif choice == '3':
+                    print(f"Dates actuelles: {START_DATE} → {END_DATE}")
+                    start = input("Nouvelle date de début (AAAA-MM-JJ): ").strip()
+                    end = input("Nouvelle date de fin (AAAA-MM-JJ): ").strip()
+                    if start and end:
+                        update_dates(start, end)
+                elif choice == '4':
+                    clear_cache()
+                elif choice == '5':
+                    print("Au revoir!")
+                    break
+                else:
+                    print("❌ Option invalide, choisissez 1-5")
+            
+            except KeyboardInterrupt:
+                print("\n\nAu revoir!")
+                break
+    else:
+        # Mode ligne de commande
+        import argparse
+        
+        parser = argparse.ArgumentParser(description="Gestion de la configuration")
+        parser.add_argument('--show', action='store_true', help='Affiche la configuration')
+        parser.add_argument('--tickers', type=str, help='Nouveaux tickers (ex: AAPL,MSFT,SPY)')
+        parser.add_argument('--dates', nargs=2, help='Nouvelles dates (START END)')
+        parser.add_argument('--clear', action='store_true', help='Nettoie les caches')
+        
+        args = parser.parse_args()
+        
+        if args.show:
+            print_config()
+        if args.tickers:
+            tickers = [t.strip().upper() for t in args.tickers.split(',')]
+            update_tickers(tickers)
+        if args.dates:
+            update_dates(args.dates[0], args.dates[1])
+        if args.clear:
+            clear_cache()
+
 # Validation automatique à l'import
 if __name__ == "__main__":
-    print_config()
-    is_valid, errors = validate_config()
-    
-    if is_valid:
-        print("\n✅ Configuration valide !")
-    else:
-        print("\n❌ Erreurs de configuration :")
-        for error in errors:
-            print(f"  - {error}")
+    manage_config()
