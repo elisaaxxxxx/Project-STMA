@@ -9,8 +9,24 @@ Tous les scripts utiliseront automatiquement ces paramètres.
 """
 
 # ===== TICKERS À ANALYSER =====
-# Liste des actions à analyser
-TICKERS = ['AAPL', 'SPY']
+# 5 actions représentant différents secteurs et types de marchés:
+TICKERS = [
+    'AAPL',   # 📱 Technology - Mega Cap (Apple)
+    'NVDA',   # 🔧 Semiconductors - High Growth (NVIDIA)
+    'JPM',    # 🏦 Financial Services - Cyclical (JP Morgan)
+    'JNJ',    # 💊 Healthcare - Defensive (Johnson & Johnson)
+    'XOM'     # ⛽ Energy - Commodity-Driven (Exxon Mobil)
+]
+
+# Caractéristiques de chaque ticker:
+# - AAPL: Tech leader, forte croissance, high volatility
+# - NVDA: Semiconducteur, très forte croissance, très volatile (AI boom)
+# - JPM: Banque, cyclique, corrélé aux taux d'intérêt
+# - JNJ:  Pharma/Healthcare, défensif, faible volatilité
+# - XOM:  Énergie, cyclique, corrélé au pétrole
+
+# Note: SPY est utilisé uniquement comme BENCHMARK (dans les features ML)
+# mais n'est PAS tradé directement
 
 # Exemples d'autres tickers intéressants à tester :
 # Actions tech (FAANG+) :
