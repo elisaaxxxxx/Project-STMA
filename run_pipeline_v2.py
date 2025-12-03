@@ -230,7 +230,31 @@ def run_full_pipeline():
     print(f"  PÉRIODE: {START_DATE} → {END_DATE}")
     print("="*80 + "\n")
     
+    # Show comprehensive results
+    show_results()
+    
     return True
+
+def show_results():
+    """Display comprehensive results using show_results.py."""
+    
+    print("\n" + "="*80)
+    print("📊 AFFICHAGE DES RÉSULTATS COMPLETS")
+    print("="*80 + "\n")
+    
+    try:
+        result = subprocess.run(
+            ['python3', 'show_results.py'],
+            check=True,
+            capture_output=False  # Show output directly
+        )
+        return True
+    except subprocess.CalledProcessError as e:
+        print(f"❌ Erreur lors de l'affichage des résultats: {e}")
+        return False
+    except Exception as e:
+        print(f"❌ Erreur inattendue: {e}")
+        return False
 
 def main():
     """Fonction principale."""

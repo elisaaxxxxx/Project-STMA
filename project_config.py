@@ -11,8 +11,20 @@ Tous les scripts utiliseront automatiquement ces paramètres.
 # ===== TICKERS À ANALYSER =====
 # Tickers à trader (changez cette liste selon vos besoins)
 TICKERS = [
-    'AAPL',   # 📱 Technology - Mega Cap (Apple)
-    'MSFT',   # � Technology - Microsoft (test d'ajout)
+    # Tech (meilleurs performers ML)
+    'AAPL',   # 📱 Apple - ML +2.19% vs B&H
+    'NVDA',   # 🎮 Nvidia - ML +21.49% vs B&H
+    
+    # Finance (stable, prévisible)
+    'JPM',    # 🏦 JP Morgan - Banque leader
+    'BAC',    # 🏦 Bank of America
+    
+    # Consumer Staples (défensif, stable)
+    'PG',     # 🧼 Procter & Gamble - Consumer goods
+    'KO',     # 🥤 Coca-Cola - Beverages
+    
+    # Healthcare (croissance stable)
+    'JNJ',    # � Johnson & Johnson - Pharma
 ]
 
 # SPY comme benchmark uniquement (pour features ML)
@@ -33,7 +45,7 @@ ALL_TICKERS = TICKERS + [BENCHMARK_TICKER]
 
 # Exemples d'autres tickers intéressants à tester :
 # Actions tech (FAANG+) :
-# TICKERS = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'NVDA', 'TSLA', 'SPY']
+# TICKERS = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'NVDA', 'TSLA', ]
 
 # ETFs diversifiés :
 # TICKERS = ['SPY', 'QQQ', 'IWM', 'VTI', 'DIA', 'EFA', 'VWO']
