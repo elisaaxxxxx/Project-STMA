@@ -167,6 +167,12 @@ def plot_regularization_analysis(results_df, ticker, save_path):
     ax1.grid(True, alpha=0.3)
     ax1.axhline(0, color='black', linestyle='-', linewidth=0.5)
     
+    # Auto-adjust y-axis to remove excess white space
+    y_min = min(results_df['test_r2'].min(), results_df['train_r2'].min())
+    y_max = max(results_df['test_r2'].max(), results_df['train_r2'].max())
+    y_range = y_max - y_min
+    ax1.set_ylim(y_min - 0.1*y_range, y_max + 0.1*y_range)
+    
     # Add annotations
     ax1.annotate('High Variance\n(Overfitting)', 
                 xy=(results_df['alpha'].min(), results_df['train_r2'].iloc[0]),
@@ -278,8 +284,8 @@ def main():
     X_train, X_test, y_train, y_test = prepare_data(train_df, test_df)
     print(f"   ✓ Features scaled")
     
-    # Generate alpha values (log scale from 10^-4 to 10^2)
-    alphas = np.logspace(-4, 2, args.n_alphas)
+    # Generate alpha values (log scale from 10^-5 to 10^1 for better range)
+    alphas = np.logspace(-5, 1, args.n_alphas)
     
     print(f"\n🤖 Training {args.n_alphas} Lasso models...")
     results_df = analyze_regularization(X_train, X_test, y_train, y_test, alphas)

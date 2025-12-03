@@ -6,7 +6,7 @@ import os
 
 # Importer la configuration (maintenant dans le dossier parent)
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from project_config import TICKERS, START_DATE, END_DATE, get_data_file_path, print_config, validate_config
+from project_config import ALL_TICKERS, START_DATE, END_DATE, get_data_file_path, print_config, validate_config
 
 class DataLoader:
     def __init__(self, ticker='SPY', start=None, end=None):
@@ -160,7 +160,7 @@ def _parse_args():
     import argparse
     
     # Récupérer les valeurs actuelles de la configuration (après rechargement éventuel)
-    current_tickers = ','.join(TICKERS)
+    current_tickers = ','.join(ALL_TICKERS)  # Inclut TICKERS + BENCHMARK
     current_start = START_DATE
     current_end = END_DATE
 
@@ -182,7 +182,7 @@ if __name__ == '__main__':
     if 'project_config' in sys.modules:
         importlib.reload(sys.modules['project_config'])
         # Re-importer les variables après rechargement
-        from project_config import TICKERS, START_DATE, END_DATE, get_data_file_path, print_config, validate_config
+        from project_config import ALL_TICKERS, START_DATE, END_DATE, get_data_file_path, print_config, validate_config
     
     # Valider la configuration
     is_valid, errors = validate_config()

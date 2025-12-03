@@ -9,14 +9,17 @@ Tous les scripts utiliseront automatiquement ces paramètres.
 """
 
 # ===== TICKERS À ANALYSER =====
-# 5 actions représentant différents secteurs et types de marchés:
+# Tickers à trader (changez cette liste selon vos besoins)
 TICKERS = [
     'AAPL',   # 📱 Technology - Mega Cap (Apple)
-    'NVDA',   # 🔧 Semiconductors - High Growth (NVIDIA)
-    'JPM',    # 🏦 Financial Services - Cyclical (JP Morgan)
-    'JNJ',    # 💊 Healthcare - Defensive (Johnson & Johnson)
-    'XOM'     # ⛽ Energy - Commodity-Driven (Exxon Mobil)
+    'MSFT',   # � Technology - Microsoft (test d'ajout)
 ]
+
+# SPY comme benchmark uniquement (pour features ML)
+BENCHMARK_TICKER = 'SPY'  # 📊 S&P 500 ETF - Benchmark uniquement
+
+# Liste complète (tickers + benchmark) pour téléchargement des données
+ALL_TICKERS = TICKERS + [BENCHMARK_TICKER]
 
 # Caractéristiques de chaque ticker:
 # - AAPL: Tech leader, forte croissance, high volatility
@@ -84,11 +87,11 @@ TRAINING_MONTHS = 36  # 3 ans
 TEST_MONTHS = 6  # 6 mois
 
 # ===== RÉPERTOIRES =====
-# Nouvelle structure : séparer programmes et données
-DATA_RAW_DIR = 'data/raw'                    # Données brutes (CSV téléchargés)
-DATA_PROCESSED_DIR = 'data/processed'        # Données avec MA et signaux  
-RESULTS_BACKTEST_DIR = 'data/results/backtest'     # Résultats des backtests
-RESULTS_VARIATIONS_DIR = 'data/results/variations'  # Tests de variations
+# Structure organisée : SRC pour pipeline traditionnel, ML pour machine learning
+DATA_RAW_DIR = 'data/SRC/raw'                    # Données brutes (CSV téléchargés)
+DATA_PROCESSED_DIR = 'data/SRC/processed'        # Données avec MA et signaux  
+RESULTS_BACKTEST_DIR = 'data/SRC/results/backtest'     # Résultats des backtests
+RESULTS_VARIATIONS_DIR = 'data/SRC/results/variations'  # Tests de variations
 
 # Anciens noms pour compatibilité (DEPRECATED)
 DATA_DIR = DATA_RAW_DIR

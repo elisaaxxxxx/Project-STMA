@@ -325,12 +325,16 @@ def create_ml_dataset(ticker):
     
     # Show sample values for verification
     print(f"\n📊 Sample feature values (first row with complete data):")
-    complete_row = ml_df.dropna(subset=FEATURE_LIST).iloc[0]
-    print(f"   Date: {complete_row['Date']}")
-    for feat in FEATURE_LIST:
-        if feat in ml_df.columns:
-            val = complete_row[feat]
-            print(f"   {feat:20s} = {val:.6f}" if not pd.isna(val) else f"   {feat:20s} = NaN")
+    complete_rows = ml_df.dropna(subset=FEATURE_LIST)
+    if len(complete_rows) > 0:
+        complete_row = complete_rows.iloc[0]
+        print(f"   Date: {complete_row['Date']}")
+        for feat in FEATURE_LIST:
+            if feat in ml_df.columns:
+                val = complete_row[feat]
+                print(f"   {feat:20s} = {val:.6f}" if not pd.isna(val) else f"   {feat:20s} = NaN")
+    else:
+        print(f"   ⚠️ No rows with all features complete (may have NaN in some features)")
     
     return ml_df
 

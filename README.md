@@ -74,9 +74,9 @@ python run_pipeline.py --all
 
 ---
 
-### 🤖 Machine Learning Pipeline (NEW!)
+###  Machine Learning Pipeline 
 
-#### 1️⃣ **Create ML Dataset**
+#### **Create ML Dataset**
 ```bash
 # For one ticker
 python ML/create_ml_data.py --ticker AAPL
@@ -96,8 +96,8 @@ python ML/verify_data_quality.py --ticker AAPL
 ```
 
 **Checks for:**
-- ✅ No future data in features
-- ✅ Proper chronological split
+-  No future data in features
+-  Proper chronological split
 - ✅ Correct target distribution (30/70)
 
 #### 3️⃣ **Train Models**
@@ -112,7 +112,7 @@ python ML/train_regression_model.py --ticker AAPL --walk-forward
 **Models trained:**
 - Linear Regression
 - Ridge Regression
-- Lasso Regression ⭐ (usually best)
+- Lasso Regression 
 - Random Forest
 - Gradient Boosting
 
