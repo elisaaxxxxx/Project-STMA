@@ -1,0 +1,5 @@
+Rank,Feature,Coefficient,Interpretation
+1,signal_t,0.002893,Current MA signal (most predictive)
+2,spy_ret_20d,0.000593,Market momentum indicator
+3,ma_short_t,-0.000201,Short MA value (mean reversion)
+4-21,Others,0.0,Dropped by Lasso (L1 regularization)

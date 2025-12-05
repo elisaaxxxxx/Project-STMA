@@ -1,4 +1,4 @@
-# Trading Strategy Project - Moving Averages + Machine Learning
+# ML-Enhanced Moving Average Trading: A Comparative Study
 
 ## Research Question
 
