@@ -406,11 +406,8 @@ def run_comparison(ticker, start_date, end_date):
     print(f"  Traditional comparison: {traditional_file}")
     print(f"  Summary comparison: {summary_file}")
     
-    # Plot equity curves (biased - traditional analysis)
+    # Plot equity curves
     plot_equity_curves(equity_curves, ticker, start_date, end_date, output_dir)
-    
-    # Plot walk-forward equity curve (unbiased)
-    plot_walk_forward_equity(df, wf_results, strategy_selections, ticker, start_date, end_date, output_dir)
     
     # Comparison summary
     print(f"\n{'='*80}")
@@ -482,146 +479,6 @@ def plot_equity_curves(equity_curves, ticker, start_date, end_date, output_dir):
     plt.savefig(plot_file, dpi=150, bbox_inches='tight')
     print(f"Equity curves plot saved to: {plot_file}")
     plt.close()
-
-def plot_walk_forward_equity(df, wf_results, strategy_selections, ticker, start_date, end_date, output_dir):
-    """
-    Plot walk-forward equity curve showing the realistic unbiased performance.
-    
-    Args:
-        df: Original DataFrame with all data
-        wf_results: List of walk-forward results for each period
-        strategy_selections: List of strategy selections for each period
-        ticker: Ticker symbol
-        start_date: Start date
-        end_date: End date
-        output_dir: Output directory for saving plots
-    """
-    print(f"\nGenerating walk-forward equity curve plot...")
-    
-    # Create unbiased subdirectory
-    unbiased_dir = output_dir / 'unbiased'
-    unbiased_dir.mkdir(parents=True, exist_ok=True)
-    
-    # Build walk-forward equity curve by stitching together test periods
-    wf_equity_data = []
-    
-    for period_result in wf_results:
-        period_num = period_result['Period']
-        test_start = period_result['Test_Start']
-        test_end = period_result['Test_End']
-        
-        # Get the selected strategy for this period
-        selection = strategy_selections[period_num - 1]
-        selected_strategy = selection['Strategy']
-        
-        # Find the corresponding signal column
-        signal_col_map = {
-            'Original (>=2 signals)': 'Buy_Original',
-            'Short-term only (5,20)': 'Buy_ShortTerm',
-            'Medium-term only (10,50)': 'Buy_MediumTerm',
-            'Long-term only (50,200)': 'Buy_LongTerm',
-            'Short OR Long': 'Buy_ShortOrLong',
-            'Short AND Medium': 'Buy_ShortAndMedium',
-            'Long AND VeryLong': 'Buy_LongAndVeryLong',
-            '>=3 of 4 signals': 'Buy_3of4',
-            'All 4 signals': 'Buy_All4',
-        }
-        signal_col = signal_col_map.get(selected_strategy, 'Buy_Original')
-        
-        # Get data for this test period
-        test_period_df = df[(df['Date'] >= test_start) & (df['Date'] <= test_end)].copy()
-        
-        if len(test_period_df) > 0:
-            # Calculate returns for this period with the selected strategy
-            test_period_df['Return'] = test_period_df['Close'].pct_change().fillna(0.0)
-            test_period_df['Position'] = test_period_df[signal_col].shift(1).fillna(0.0)
-            test_period_df['Trade'] = (test_period_df['Position'] != test_period_df['Position'].shift(1)).astype(int)
-            test_period_df['StratRetGross'] = test_period_df['Position'] * test_period_df['Return']
-            test_period_df['StratRetNet'] = test_period_df['StratRetGross'] - test_period_df['Trade'] * 0.001
-            
-            for _, row in test_period_df.iterrows():
-                wf_equity_data.append({
-                    'Date': row['Date'],
-                    'Return': row['StratRetNet'],
-                    'BH_Return': row['Return'],
-                    'Period': period_num,
-                    'Strategy': selected_strategy
-                })
-    
-    # Convert to DataFrame and calculate cumulative equity
-    wf_df = pd.DataFrame(wf_equity_data)
-    wf_df = wf_df.sort_values('Date').reset_index(drop=True)
-    wf_df['WF_Equity'] = (1 + wf_df['Return']).cumprod()
-    wf_df['BH_Equity'] = (1 + wf_df['BH_Return']).cumprod()
-    
-    # Create the plot
-    plt.figure(figsize=(14, 10))
-    
-    # Plot 1: Walk-Forward Equity Curve vs Buy & Hold
-    plt.subplot(2, 1, 1)
-    plt.plot(wf_df['Date'], wf_df['WF_Equity'], label='Walk-Forward (Unbiased)', 
-             color='blue', linewidth=2)
-    plt.plot(wf_df['Date'], wf_df['BH_Equity'], label='Buy & Hold', 
-             color='black', linewidth=2, linestyle='--')
-    plt.title(f'{ticker}: Walk-Forward Strategy - UNBIASED (No Look-Ahead)\n({start_date} to {end_date})', 
-              fontsize=13, fontweight='bold')
-    plt.ylabel('Equity (Growth of $1)', fontsize=11)
-    plt.legend(loc='upper left', fontsize=10)
-    plt.grid(True, alpha=0.3)
-    
-    # Plot 2: Strategy selection over time with colored segments
-    plt.subplot(2, 1, 2)
-    
-    # Plot equity with different colors for different strategies
-    strategy_colors = {
-        'Original (>=2 signals)': '#1f77b4',
-        'Short-term only (5,20)': '#ff7f0e',
-        'Medium-term only (10,50)': '#2ca02c',
-        'Long-term only (50,200)': '#d62728',
-        'Short OR Long': '#9467bd',
-        'Short AND Medium': '#8c564b',
-        'Long AND VeryLong': '#e377c2',
-        '>=3 of 4 signals': '#7f7f7f',
-        'All 4 signals': '#bcbd22',
-    }
-    
-    # Plot equity curve with segments colored by strategy
-    for period_num in wf_df['Period'].unique():
-        period_data = wf_df[wf_df['Period'] == period_num]
-        strategy = period_data['Strategy'].iloc[0]
-        color = strategy_colors.get(strategy, '#000000')
-        plt.plot(period_data['Date'], period_data['WF_Equity'], 
-                color=color, linewidth=2, alpha=0.8)
-    
-    # Add legend with unique strategies
-    unique_strategies = wf_df.groupby('Strategy').size().sort_values(ascending=False)
-    handles = []
-    labels = []
-    for strategy in unique_strategies.index:
-        color = strategy_colors.get(strategy, '#000000')
-        count = unique_strategies[strategy]
-        handles.append(plt.Line2D([0], [0], color=color, linewidth=2))
-        labels.append(f'{strategy} ({count} periods)')
-    
-    plt.legend(handles, labels, loc='upper left', fontsize=8, ncol=2)
-    plt.title(f'{ticker}: Strategy Selection by Period (Colored Segments)', 
-              fontsize=13, fontweight='bold')
-    plt.xlabel('Date', fontsize=11)
-    plt.ylabel('Equity (Growth of $1)', fontsize=11)
-    plt.grid(True, alpha=0.3)
-    
-    plt.tight_layout()
-    
-    # Save plot
-    plot_file = unbiased_dir / f"{ticker}_walk_forward_unbiased_equity.png"
-    plt.savefig(plot_file, dpi=150, bbox_inches='tight')
-    print(f"Walk-forward unbiased equity plot saved to: {plot_file}")
-    plt.close()
-    
-    # Also save the walk-forward equity data
-    csv_file = unbiased_dir / f"{ticker}_walk_forward_equity_data.csv"
-    wf_df.to_csv(csv_file, index=False)
-    print(f"Walk-forward equity data saved to: {csv_file}")
 
 def main():
     """Main function to test all signal variations using walk-forward analysis."""
