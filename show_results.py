@@ -115,6 +115,8 @@ def load_regularization_results(ticker):
             'alpha': best_row['alpha'],
             'test_r2': best_row['test_r2'],
             'train_r2': best_row['train_r2'],
+            'test_rmse': best_row['test_rmse'],
+            'test_mae': best_row['test_mae'],
             'n_features': best_row['n_nonzero_coefs']
         }
     else:
@@ -376,6 +378,8 @@ def create_table4_ml_metrics(reg_results):
             'Optimal Alpha': f"{r['alpha']:.2e}",
             'Train R² (%)': r['train_r2'] * 100,
             'Test R² (%)': r['test_r2'] * 100,
+            'Test RMSE': r['test_rmse'],
+            'Test MAE': r['test_mae'],
             'Features Selected': f"{int(r['n_features'])}/21",
             'Overfitting Gap (%)': (r['train_r2'] - r['test_r2']) * 100
         })
@@ -383,6 +387,8 @@ def create_table4_ml_metrics(reg_results):
     # Add average row
     avg_train = sum(r['train_r2'] for r in reg_results) / len(reg_results) * 100
     avg_test = sum(r['test_r2'] for r in reg_results) / len(reg_results) * 100
+    avg_rmse = sum(r['test_rmse'] for r in reg_results) / len(reg_results)
+    avg_mae = sum(r['test_mae'] for r in reg_results) / len(reg_results)
     avg_features = sum(r['n_features'] for r in reg_results) / len(reg_results)
     
     rows.append({
@@ -390,6 +396,8 @@ def create_table4_ml_metrics(reg_results):
         'Optimal Alpha': '-',
         'Train R² (%)': avg_train,
         'Test R² (%)': avg_test,
+        'Test RMSE': avg_rmse,
+        'Test MAE': avg_mae,
         'Features Selected': f"{avg_features:.1f}/21",
         'Overfitting Gap (%)': avg_train - avg_test
     })
@@ -442,7 +450,7 @@ def create_table6_feature_importance():
     return table
 
 def create_table7_model_comparison():
-    """Table 7: Model Comparison (Average Test R² Across Tickers)"""
+    """Table 7: Model Comparison (Example: AAPL)"""
     
     table = pd.DataFrame({
         'Model': ['Linear Regression', 'Ridge Regression', 'Lasso Regression', 
