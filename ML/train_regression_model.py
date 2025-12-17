@@ -33,8 +33,10 @@ import joblib
 sys.path.append(str(Path(__file__).parent.parent))
 import project_config as config
 
-ML_DATA_DIR = Path("data/ML")
-ML_MODELS_DIR = Path("ML/models")
+# Utilise le dossier racine du projet pour des chemins absolus
+PROJECT_ROOT = Path(__file__).parent.parent.absolute()
+ML_DATA_DIR = PROJECT_ROOT / "data" / "ML"
+ML_MODELS_DIR = PROJECT_ROOT / "ML" / "models"
 os.makedirs(ML_MODELS_DIR, exist_ok=True)
 
 # Features to use for training

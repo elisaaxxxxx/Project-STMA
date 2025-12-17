@@ -26,8 +26,10 @@ warnings.filterwarnings('ignore')
 sys.path.append(str(Path(__file__).parent.parent))
 import project_config as config
 
-DATA_PROCESSED_DIR = Path("data/SRC/processed")
-ML_DATA_DIR = Path("data/ML")
+# Utilise le dossier racine du projet pour des chemins absolus
+PROJECT_ROOT = Path(__file__).parent.parent.absolute()
+DATA_PROCESSED_DIR = PROJECT_ROOT / "data" / "SRC" / "processed"
+ML_DATA_DIR = PROJECT_ROOT / "data" / "ML"
 os.makedirs(ML_DATA_DIR, exist_ok=True)
 
 # MA pairs to test

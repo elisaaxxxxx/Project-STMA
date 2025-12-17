@@ -7,6 +7,51 @@
 
 ---
 
+## 🚀 Quick Installation
+
+### Prerequisites
+- **Python 3.9+** (recommended: Python 3.11 or 3.13)
+
+### Installation Steps
+
+```bash
+# 1. Clone/download the project
+cd /path/to/Project
+
+# 2. Create and activate virtual environment
+python3 -m venv .venv
+source .venv/bin/activate  # On macOS/Linux
+# OR: .venv\Scripts\activate  # On Windows
+
+# 3. Install dependencies
+pip install -r Environment/environment_pip.txt
+
+# 4. Verify installation
+python3 -c "import pandas, numpy, sklearn, yfinance; print('✅ Ready!')"
+
+# 5. Run the complete pipeline
+python3 main.py --all
+```
+
+> **⚠️ Important Notes:**
+> - Each user must create their own virtual environment. The `.venv/` folder is NOT shared via Git.
+> - **The code works from ANY directory!** You can run `python3 /full/path/to/Project/main.py --all` from anywhere.
+> - All paths are absolute, so files are ALWAYS created inside the project directory, regardless of where you run the command.
+
+### Alternative: Using Conda
+
+```bash
+# Create environment from YAML file
+conda env create -f Environment/environment.yml
+
+# Activate environment
+conda activate trading-ml-project
+
+# Run pipeline
+python3 main.py --all
+```
+---
+
 ## Project Overview
 
 A comprehensive automated trading system combining traditional technical analysis with machine learning to optimize moving average strategies.
@@ -75,7 +120,7 @@ Project/
 │       └── ... (other tickers)
 │
 ├──  project_config.py                      # CENTRAL CONFIGURATION
-├──  run_pipeline_v2.py                     # AUTOMATED PIPELINE (Traditional + ML)
+├──  main.py                                # AUTOMATED PIPELINE (Traditional + ML)
 ├──  show_results.py                        # RESULTS COMPARISON TOOL
 ├──  show_structure.py                      # Display project structure
 └──  README.md                              # This documentation
@@ -111,7 +156,7 @@ END_DATE = '2025-11-01'
 ### Step 2: **Run Complete Pipeline**
 
 ```bash
-python run_pipeline_v2.py --all
+python main.py --all
 ```
 
 **This single command automatically:**
@@ -147,19 +192,19 @@ python show_results.py
 
 ```bash
 # Complete pipeline (recommended)
-python run_pipeline_v2.py --all
+python main.py --all
 
 # Traditional pipeline only
-python run_pipeline_v2.py --traditional
+python main.py --traditional
 
 # ML pipeline only
-python run_pipeline_v2.py --ml
+python main.py --ml
 
-# View configuration
-python run_pipeline_v2.py --config
+# Show configuration
+python main.py --config
 
-# Interactive menu
-python run_pipeline_v2.py
+# Interactive mode (menu)
+python main.py
 ```
 
 ---
@@ -673,7 +718,7 @@ EXTREMES:
 ```bash
 # 1. Configure tickers in project_config.py
 # 2. Run complete pipeline
-python run_pipeline_v2.py --all
+python main.py --all
 # 3. View results
 python show_results.py
 # 4. Analyze individual plots in data/ML/backtest_results/

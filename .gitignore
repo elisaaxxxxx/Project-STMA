@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Data files (générés automatiquement)
+data/SRC/raw/*.csv
+data/SRC/processed/*.csv
+data/SRC/results/**/*.csv
+data/ML/*.csv
+data/ML/backtest_results/*.csv
+data/ML/regularization_analysis/*.csv
+data/ML/regularization_analysis/*.png
+
+# Model files (trop volumineux)
+ML/models/*.pkl
+
+# Output files
+data/tables_for_report/*.csv
+*.log
+
+# Keep directory structure but not files
+!data/SRC/raw/.gitkeep
+!data/SRC/processed/.gitkeep
+!data/SRC/results/backtest/.gitkeep
+!data/SRC/results/variations/.gitkeep
+!data/ML/.gitkeep
+!data/ML/backtest_results/.gitkeep
+!data/ML/regularization_analysis/.gitkeep
+!ML/models/.gitkeep

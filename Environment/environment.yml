@@ -3,12 +3,25 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - python=3.13
-  - pandas
-  - numpy
-  - matplotlib
-  - scikit-learn
-  - joblib
-  - pip
+  # Python interpreter (exact version)
+  - python=3.13.7
+  
+  # Core data science libraries (exact versions)
+  - pandas=2.3.3
+  - numpy=2.3.4
+  
+  # Machine Learning
+  - scikit-learn=1.7.2
+  
+  # Visualization
+  - matplotlib=3.10.7
+  
+  # Utilities
+  - joblib=1.5.2
+  
+  # Package manager
+  - pip>=23.0
+  
+  # Packages installed via pip (exact versions)
   - pip:
-    - yfinance
+    - yfinance==0.2.66

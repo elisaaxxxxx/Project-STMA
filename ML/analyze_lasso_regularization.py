@@ -30,8 +30,10 @@ import matplotlib.pyplot as plt
 sys.path.append(str(Path(__file__).parent.parent))
 import project_config as config
 
-ML_DATA_DIR = Path("data/ML")
-RESULTS_DIR = Path("data/ML/regularization_analysis")
+# Utilise le dossier racine du projet pour des chemins absolus
+PROJECT_ROOT = Path(__file__).parent.parent.absolute()
+ML_DATA_DIR = PROJECT_ROOT / "data" / "ML"
+RESULTS_DIR = PROJECT_ROOT / "data" / "ML" / "regularization_analysis"
 os.makedirs(RESULTS_DIR, exist_ok=True)
 
 # Features

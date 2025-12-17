@@ -11,10 +11,10 @@ data/
   └── ML/           # Données et résultats ML
 
 Usage:
-    python run_pipeline_v2.py --all          # Pipeline complet
-    python run_pipeline_v2.py --traditional  # Pipeline traditionnel
-    python run_pipeline_v2.py --ml           # Pipeline ML
-    python run_pipeline_v2.py --config       # Voir config
+    python main.py --all          # Pipeline complet
+    python main.py --traditional  # Pipeline traditionnel
+    python main.py --ml           # Pipeline ML
+    python main.py --config       # Voir config
 """
 
 import sys

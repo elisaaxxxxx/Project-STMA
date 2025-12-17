@@ -8,8 +8,11 @@ from pathlib import Path
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import Lasso
 
+# Utilise le dossier racine du projet pour des chemins absolus
+PROJECT_ROOT = Path(__file__).parent.parent.absolute()
+
 # Load the regularization analysis results
-results_file = Path("data/ML/regularization_analysis/AAPL_lasso_regularization_analysis.csv")
+results_file = PROJECT_ROOT / "data" / "ML" / "regularization_analysis" / "AAPL_lasso_regularization_analysis.csv"
 results_df = pd.read_csv(results_file)
 
 # Find optimal alpha (best test R²)
@@ -23,7 +26,7 @@ print(f"{'='*80}")
 print(f"\nTest R²: {best_r2:.6f}")
 
 # Load ML data
-ml_data = pd.read_csv("data/ML/AAPL_ml_data.csv")
+ml_data = pd.read_csv(PROJECT_ROOT / "data" / "ML" / "AAPL_ml_data.csv")
 ml_data['Date'] = pd.to_datetime(ml_data['Date'])
 ml_data = ml_data.sort_values('Date').reset_index(drop=True)
 

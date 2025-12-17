@@ -28,9 +28,11 @@ import matplotlib.dates as mdates
 sys.path.append(str(Path(__file__).parent.parent))
 import project_config as config
 
-ML_DATA_DIR = Path("data/ML")
-ML_MODELS_DIR = Path("ML/models")
-RESULTS_DIR = Path("data/ML/backtest_results")
+# Utilise le dossier racine du projet pour des chemins absolus
+PROJECT_ROOT = Path(__file__).parent.parent.absolute()
+ML_DATA_DIR = PROJECT_ROOT / "data" / "ML"
+ML_MODELS_DIR = PROJECT_ROOT / "ML" / "models"
+RESULTS_DIR = PROJECT_ROOT / "data" / "ML" / "backtest_results"
 os.makedirs(RESULTS_DIR, exist_ok=True)
 
 # Features

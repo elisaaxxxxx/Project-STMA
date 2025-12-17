@@ -99,11 +99,20 @@ TRAINING_MONTHS = 36  # 3 ans
 TEST_MONTHS = 6  # 6 mois
 
 # ===== RÉPERTOIRES =====
+# Utilise des chemins ABSOLUS basés sur l'emplacement de ce fichier
+# Cela garantit que les données sont toujours créées au bon endroit,
+# peu importe d'où on lance le script
+import os
+from pathlib import Path
+
+# Trouve le dossier racine du projet (là où se trouve ce fichier)
+PROJECT_ROOT = Path(__file__).parent.absolute()
+
 # Structure organisée : SRC pour pipeline traditionnel, ML pour machine learning
-DATA_RAW_DIR = 'data/SRC/raw'                    # Données brutes (CSV téléchargés)
-DATA_PROCESSED_DIR = 'data/SRC/processed'        # Données avec MA et signaux  
-RESULTS_BACKTEST_DIR = 'data/SRC/results/backtest'     # Résultats des backtests
-RESULTS_VARIATIONS_DIR = 'data/SRC/results/variations'  # Tests de variations
+DATA_RAW_DIR = str(PROJECT_ROOT / 'data' / 'SRC' / 'raw')                    # Données brutes (CSV téléchargés)
+DATA_PROCESSED_DIR = str(PROJECT_ROOT / 'data' / 'SRC' / 'processed')        # Données avec MA et signaux  
+RESULTS_BACKTEST_DIR = str(PROJECT_ROOT / 'data' / 'SRC' / 'results' / 'backtest')     # Résultats des backtests
+RESULTS_VARIATIONS_DIR = str(PROJECT_ROOT / 'data' / 'SRC' / 'results' / 'variations')  # Tests de variations
 
 # Anciens noms pour compatibilité (DEPRECATED)
 DATA_DIR = DATA_RAW_DIR
