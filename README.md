@@ -15,18 +15,24 @@
 ### Installation Steps
 
 ```bash
-# 1. Create and activate virtual environment
+# 1. Clone the repository
+git clone https://github.com/elisaaxxxxx/Project-STMA.git
+
+# 2. Navigate to project directory
+cd Project-STMA
+
+# 3. Create and activate virtual environment
 python3 -m venv .venv
 source .venv/bin/activate
 
-# 2. Install dependencies
+# 4. Install dependencies
 pip install -r Environment/environment_pip.txt
 
-# 3. Verify
-python3 -c "import pandas, numpy, sklearn, yfinance; print('✅ Ready!')"
-
-# 4. Run
+# 5. Run the complete pipeline
 python3 main.py --all
+
+# 6. View results anytime
+python3 show_results.py
 ```
 
 > **⚠️ Important Notes:**
