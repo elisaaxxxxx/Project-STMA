@@ -1,6 +1,0 @@
-Model,Test R² (%),Features Used,Overfitting,Selection
-Linear Regression,-27.8,21/21,Severe,❌
-Ridge Regression,-27.8,21/21,Severe,❌
-Lasso Regression,1.1,3/21,Minimal,[OK] SELECTED
-Random Forest,-25.5,21/21,Severe,❌
-Gradient Boosting,-27.4,21/21,Severe,❌
