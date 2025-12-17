@@ -15,21 +15,17 @@
 ### Installation Steps
 
 ```bash
-# 1. Clone/download the project
-cd /path/to/Project
-
-# 2. Create and activate virtual environment
+# 1. Create and activate virtual environment
 python3 -m venv .venv
-source .venv/bin/activate  # On macOS/Linux
-# OR: .venv\Scripts\activate  # On Windows
+source .venv/bin/activate
 
-# 3. Install dependencies
+# 2. Install dependencies
 pip install -r Environment/environment_pip.txt
 
-# 4. Verify installation
+# 3. Verify
 python3 -c "import pandas, numpy, sklearn, yfinance; print('✅ Ready!')"
 
-# 5. Run the complete pipeline
+# 4. Run
 python3 main.py --all
 ```
 
