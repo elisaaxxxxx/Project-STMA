@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 """
-Pipeline V2 - Corrigé pour la nouvelle structure de dossiers
-============================================================
+Pipeline V2 - Fixed for new folder structure
+============================================
 
-Structure des dossiers:
+Folder structure:
 data/
-  ├── raw/          # Données téléchargées
-  ├── processed/    # Données avec MA et signaux
-  ├── results/      # Résultats backtests traditionnels
-  └── ML/           # Données et résultats ML
+  ├── raw/          # Downloaded data
+  ├── processed/    # Data with MA and signals
+  ├── results/      # Traditional backtest results
+  └── ML/           # ML data and results
 
 Usage:
-    python main.py --all          # Pipeline complet
-    python main.py --traditional  # Pipeline traditionnel
-    python main.py --ml           # Pipeline ML
-    python main.py --config       # Voir config
+    python main.py --all          # Complete pipeline
+    python main.py --traditional  # Traditional pipeline
+    python main.py --ml           # ML pipeline
+    python main.py --config       # View config
 """
 
 import sys
@@ -28,7 +28,7 @@ from project_config import (TICKERS, ALL_TICKERS, BENCHMARK_TICKER,
                            START_DATE, END_DATE, print_config, validate_config)
 
 def ensure_directories():
-    """Crée tous les dossiers nécessaires."""
+    """Creates all necessary directories."""
     dirs = [
         'data/SRC/raw',
         'data/SRC/processed', 
@@ -41,19 +41,19 @@ def ensure_directories():
     ]
     for d in dirs:
         Path(d).mkdir(parents=True, exist_ok=True)
-    print("✅ Tous les dossiers créés")
+    print("✅ All directories created")
 
 def check_data_files():
-    """Vérifie si les fichiers raw existent."""
+    """Checks if raw files exist."""
     missing = []
-    for ticker in ALL_TICKERS:  # Vérifie tous les tickers incluant benchmark
+    for ticker in ALL_TICKERS:  # Check all tickers including benchmark
         file = Path(f"data/SRC/raw/{ticker}_{START_DATE}_{END_DATE}.csv")
         if not file.exists():
             missing.append(ticker)
     
     if missing:
-        print(f"\n⚠️  Données manquantes: {', '.join(missing)}")
-        print("📥 Téléchargement automatique...")
+        print(f"\n⚠️  Missing data: {', '.join(missing)}")
+        print("📥 Automatic download...")
         
         try:
             result = subprocess.run(
@@ -62,35 +62,35 @@ def check_data_files():
                 text=True
             )
             if result.returncode == 0:
-                print("✅ Données téléchargées!")
+                print("✅ Data downloaded!")
                 return []
             else:
-                print(f"❌ Erreur: {result.stderr}")
+                print(f"❌ Error: {result.stderr}")
                 return missing
         except Exception as e:
-            print(f"❌ Erreur: {e}")
+            print(f"❌ Error: {e}")
             return missing
     
     return []
 
 def run_traditional_pipeline():
-    """Exécute le pipeline traditionnel."""
+    """Executes the traditional pipeline."""
     print("\n" + "="*70)
-    print("🚀 PIPELINE TRADITIONNEL")
+    print("🚀 TRADITIONAL PIPELINE")
     print("="*70)
     print_config()
     
-    # Vérifier les données
+    # Check data
     ensure_directories()
     missing = check_data_files()
     if missing:
-        print(f"\n❌ Impossible de télécharger: {', '.join(missing)}")
+        print(f"\n❌ Unable to download: {', '.join(missing)}")
         return False
     
-    # Étapes
+    # Steps
     scripts = [
-        ("Moyennes mobiles", "src/calculate_moving_averages.py"),
-        ("Signaux", "src/generate_signals.py"),
+        ("Moving averages", "src/calculate_moving_averages.py"),
+        ("Signals", "src/generate_signals.py"),
         ("Backtest", "src/backtest_signal_strategy.py"),
         ("Variations", "src/test_signal_variations.py")
     ]
@@ -102,18 +102,18 @@ def run_traditional_pipeline():
         
         result = subprocess.run(
             [sys.executable, script],
-            capture_output=False  # Afficher la sortie en direct
+            capture_output=False  # Display output in real time
         )
         
         if result.returncode != 0:
-            print(f"\n❌ Échec: {name}")
+            print(f"\n❌ Failed: {name}")
             return False
     
     print("\n" + "="*70)
-    print("✅ PIPELINE TRADITIONNEL TERMINÉ!")
+    print("✅ TRADITIONAL PIPELINE COMPLETED!")
     print("="*80 + "\n")
-    print("📊 Résultats:")
-    print("  • data/SRC/processed/ - Données avec MA et signaux")
+    print("📊 Results:")
+    print("  • data/SRC/processed/ - Data with MA and signals")
     print("  • data/SRC/results/backtest/ - Backtests")
     print("  • data/SRC/results/variations/ - Walk-forward")
     print("="*70)
@@ -121,16 +121,16 @@ def run_traditional_pipeline():
     return True
 
 def run_ml_pipeline():
-    """Exécute le pipeline ML."""
+    """Executes the ML pipeline."""
     print("\n" + "="*70)
-    print("🤖 PIPELINE MACHINE LEARNING")
+    print("🤖 MACHINE LEARNING PIPELINE")
     print("="*70)
     print_config()
     
     ensure_directories()
     
-    # Vérifier que les données processed existent
-    print("\n📋 Vérification des données processed...")
+    # Check that processed data exists
+    print("\n📋 Checking processed data...")
     missing = []
     for ticker in TICKERS:
         file = Path(f"data/SRC/processed/{ticker}_{START_DATE}_{END_DATE}_with_signals.csv")
@@ -138,17 +138,17 @@ def run_ml_pipeline():
             missing.append(ticker)
     
     if missing:
-        print(f"⚠️  Données processed manquantes: {', '.join(missing)}")
-        print("📊 Exécution du pipeline traditionnel d'abord...")
+        print(f"⚠️  Missing processed data: {', '.join(missing)}")
+        print("📊 Running traditional pipeline first...")
         if not run_traditional_pipeline():
             return False
     
-    # Étapes ML
+    # ML steps
     ml_steps = [
-        ("Création datasets ML", "ML/create_ml_data.py", None),
-        ("Entraînement modèles", "ML/train_regression_model.py", None),
-        ("Analyse régularisation", "ML/analyze_lasso_regularization.py", ["--n-alphas", "50"]),
-        ("Backtest ML", "ML/backtest_ml_strategy.py", ["--model", "lasso_regression"])
+        ("Create ML datasets", "ML/create_ml_data.py", None),
+        ("Train models", "ML/train_regression_model.py", None),
+        ("Regularization analysis", "ML/analyze_lasso_regularization.py", ["--n-alphas", "50"]),
+        ("ML Backtest", "ML/backtest_ml_strategy.py", ["--model", "lasso_regression"])
     ]
     
     for name, script, extra_args in ml_steps:
@@ -166,68 +166,68 @@ def run_ml_pipeline():
             result = subprocess.run(cmd, capture_output=True, text=True)
             
             if result.returncode != 0:
-                print(f"❌ Erreur pour {ticker}:")
+                print(f"❌ Error for {ticker}:")
                 print(result.stderr)
                 return False
             else:
-                # Afficher juste les lignes importantes
+                # Display only important lines
                 for line in result.stdout.split('\n'):
                     if any(x in line for x in ['✅', '✓', 'CAGR', 'Sharpe', 'Test R²', 'Best']):
                         print(line)
     
     print("\n" + "="*70)
-    print("✅ PIPELINE ML TERMINÉ!")
+    print("✅ ML PIPELINE COMPLETED!")
     print("="*70)
-    print("📊 Résultats ML:")
-    print("  • data/ML/ - Datasets ML")
-    print("  • ML/models/ - Modèles entraînés")
+    print("📊 ML Results:")
+    print("  • data/ML/ - ML Datasets")
+    print("  • ML/models/ - Trained models")
     print("  • data/ML/regularization_analysis/ - Analyses")
-    print("  • data/ML/backtest_results/ - Backtests ML")
+    print("  • data/ML/backtest_results/ - ML Backtests")
     print("="*70)
     
     return True
 
 def run_full_pipeline():
-    """Pipeline complet."""
+    """Complete pipeline."""
     print("\n" + "="*80)
-    print("🚀 PIPELINE COMPLET (TRADITIONAL + ML)")
+    print("🚀 COMPLETE PIPELINE (TRADITIONAL + ML)")
     print("="*80)
     
     # Phase 1: Traditional
     print("\n" + "="*80)
-    print("PHASE 1: PIPELINE TRADITIONNEL")
+    print("PHASE 1: TRADITIONAL PIPELINE")
     print("="*80)
     
     if not run_traditional_pipeline():
-        print("\n❌ Échec phase 1")
+        print("\n❌ Phase 1 failed")
         return False
     
     # Phase 2: ML
     print("\n" + "="*80)
-    print("PHASE 2: PIPELINE ML")
+    print("PHASE 2: ML PIPELINE")
     print("="*80)
     
     if not run_ml_pipeline():
-        print("\n❌ Échec phase 2")
+        print("\n❌ Phase 2 failed")
         return False
     
-    # Résumé final
+    # Final summary
     print("\n" + "="*80)
-    print("✅✅✅ PIPELINE COMPLET TERMINÉ! ✅✅✅")
+    print("✅✅✅ COMPLETE PIPELINE FINISHED! ✅✅✅")
     print("="*80)
-    print(f"\n📊 RÉSUMÉ:")
-    print(f"\n  PIPELINE TRADITIONNEL:")
-    print(f"    • Données: data/SRC/processed/")
+    print(f"\n📊 SUMMARY:")
+    print(f"\n  TRADITIONAL PIPELINE:")
+    print(f"    • Data: data/SRC/processed/")
     print(f"    • Backtests: data/SRC/results/backtest/")
     print(f"    • Walk-forward: data/SRC/results/variations/")
-    print(f"\n  PIPELINE ML:")
+    print(f"\n  ML PIPELINE:")
     print(f"    • Datasets: data/ML/")
-    print(f"    • Modèles: ML/models/")
+    print(f"    • Models: ML/models/")
     print(f"    • Analyses: data/ML/regularization_analysis/")
-    print(f"    • Backtests ML: data/ML/backtest_results/")
+    print(f"    • ML Backtests: data/ML/backtest_results/")
     print(f"  TICKERS: {', '.join(TICKERS)}")
     print(f"  BENCHMARK: {BENCHMARK_TICKER}")
-    print(f"  PÉRIODE: {START_DATE} → {END_DATE}")
+    print(f"  PERIOD: {START_DATE} → {END_DATE}")
     print("="*80 + "\n")
     
     # Show comprehensive results
@@ -239,7 +239,7 @@ def show_results():
     """Display comprehensive results using show_results.py."""
     
     print("\n" + "="*80)
-    print("📊 AFFICHAGE DES RÉSULTATS COMPLETS")
+    print("📊 DISPLAYING COMPLETE RESULTS")
     print("="*80 + "\n")
     
     try:
@@ -250,54 +250,54 @@ def show_results():
         )
         return True
     except subprocess.CalledProcessError as e:
-        print(f"❌ Erreur lors de l'affichage des résultats: {e}")
+        print(f"❌ Error displaying results: {e}")
         return False
     except Exception as e:
-        print(f"❌ Erreur inattendue: {e}")
+        print(f"❌ Unexpected error: {e}")
         return False
 
 def main():
-    """Fonction principale."""
+    """Main function."""
     
-    # Validation config
+    # Config validation
     is_valid, errors = validate_config()
     if not is_valid:
-        print("❌ ERREURS DE CONFIGURATION:")
+        print("❌ CONFIGURATION ERRORS:")
         for error in errors:
             print(f"  - {error}")
         return 1
     
     parser = argparse.ArgumentParser(
-        description="Pipeline V2 - Structure corrigée",
+        description="Pipeline V2 - Fixed structure",
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
     
     parser.add_argument('--all', action='store_true',
-                       help='Pipeline complet')
+                       help='Complete pipeline')
     parser.add_argument('--traditional', action='store_true',
-                       help='Pipeline traditionnel')
+                       help='Traditional pipeline')
     parser.add_argument('--ml', action='store_true',
-                       help='Pipeline ML')
+                       help='ML pipeline')
     parser.add_argument('--config', action='store_true',
-                       help='Afficher config')
+                       help='Display config')
     
     args = parser.parse_args()
     
-    # Si pas d'arguments
+    # If no arguments
     if not any(vars(args).values()):
         print("\n" + "="*70)
-        print("🎯 PIPELINE V2 - STRUCTURE CORRIGÉE")
+        print("🎯 PIPELINE V2 - FIXED STRUCTURE")
         print("="*70)
         print_config()
         print("\n📋 OPTIONS:")
-        print("  1. Pipeline complet (Traditional + ML)")
-        print("  2. Pipeline traditionnel seulement")
-        print("  3. Pipeline ML seulement")
-        print("  4. Afficher configuration")
-        print("  5. Quitter")
+        print("  1. Complete pipeline (Traditional + ML)")
+        print("  2. Traditional pipeline only")
+        print("  3. ML pipeline only")
+        print("  4. Display configuration")
+        print("  5. Quit")
         
         try:
-            choice = input("\n👉 Choisir (1-5): ").strip()
+            choice = input("\n👉 Choose (1-5): ").strip()
             
             if choice == '1':
                 run_full_pipeline()
@@ -308,15 +308,15 @@ def main():
             elif choice == '4':
                 print_config()
             elif choice == '5':
-                print("👋 Au revoir!")
+                print("👋 Goodbye!")
             else:
-                print("❌ Option invalide")
+                print("❌ Invalid option")
         except KeyboardInterrupt:
-            print("\n👋 Au revoir!")
+            print("\n👋 Goodbye!")
         
         return 0
     
-    # Exécution selon arguments
+    # Execute according to arguments
     if args.config:
         print_config()
     

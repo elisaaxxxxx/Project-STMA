@@ -28,7 +28,7 @@ import matplotlib.dates as mdates
 sys.path.append(str(Path(__file__).parent.parent))
 import project_config as config
 
-# Utilise le dossier racine du projet pour des chemins absolus
+# Use project root directory for absolute paths
 PROJECT_ROOT = Path(__file__).parent.parent.absolute()
 ML_DATA_DIR = PROJECT_ROOT / "data" / "ML"
 ML_MODELS_DIR = PROJECT_ROOT / "ML" / "models"

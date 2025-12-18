@@ -1,12 +1,12 @@
 """
 Backtest a 0/1 trading signal with transaction costs.
 
-Ce script utilise la configuration centralisée pour :
-- Calculer les rendements avec les coûts de transaction configurés
-- Analyser les performances selon les paramètres configurés
-- Sauvegarder dans les dossiers configurés
+This script uses centralized configuration to:
+- Calculate returns with configured transaction costs
+- Analyze performance according to configured parameters
+- Save to configured directories
 
-Les paramètres sont définis dans project_config.py
+Parameters are defined in project_config.py
 """
 import pandas as pd
 import numpy as np
@@ -15,7 +15,7 @@ from pathlib import Path
 import sys
 import os
 
-# Importer la configuration
+# Import configuration
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from project_config import (TICKERS, START_DATE, END_DATE, TRANSACTION_COST, 
                            TRADING_DAYS_PER_YEAR, RESULTS_DIR, 
@@ -68,7 +68,7 @@ def backtest_signal(df, cost=None):
 def run_for_ticker(ticker):
     print(f"\n{'='*30}\nProcessing {ticker}\n{'='*30}")
     
-    # Utilise les chemins configurés
+    # Use configured paths
     input_path = Path(get_signals_file_path(ticker))
     results_dir = Path(RESULTS_DIR)
     results_dir.mkdir(parents=True, exist_ok=True)
@@ -122,17 +122,17 @@ def run_for_ticker(ticker):
     print(f"Plot saved to {plot_path}\n")
 
 def main():
-    # Validation de la configuration
+    # Configuration validation
     is_valid, errors = validate_config()
     if not is_valid:
-        print("❌ Erreurs de configuration :")
+        print("❌ Configuration errors:")
         for error in errors:
             print(f"  - {error}")
         return
     
     print_config()
     
-    # Utilise les tickers configurés
+    # Use configured tickers
     for ticker in TICKERS:
         run_for_ticker(ticker)
 

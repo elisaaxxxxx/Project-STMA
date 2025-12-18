@@ -2,12 +2,12 @@
 """
 Test different signal combination strategies to find optimal performance.
 
-Ce script utilise la configuration centralisée pour :
-- Tester différentes combinaisons de signaux MA
-- Effectuer une analyse walk-forward pour éviter le look-ahead bias
-- Comparer les performances avec différentes stratégies
+This script uses centralized configuration to:
+- Test different MA signal combinations
+- Perform walk-forward analysis to avoid look-ahead bias
+- Compare performance with different strategies
 
-Les paramètres sont définis dans project_config.py
+Parameters are defined in project_config.py
 """
 
 import pandas as pd
@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 import sys
 import os
 
-# Importer la configuration
+# Import configuration
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from project_config import (TICKERS, START_DATE, END_DATE, TRANSACTION_COST, 
                            TRADING_DAYS_PER_YEAR, RESULTS_VARIATIONS_DIR, 
@@ -483,17 +483,17 @@ def plot_equity_curves(equity_curves, ticker, start_date, end_date, output_dir):
 def main():
     """Main function to test all signal variations using walk-forward analysis."""
     
-    # Validation de la configuration
+    # Configuration validation
     is_valid, errors = validate_config()
     if not is_valid:
-        print("❌ Erreurs de configuration :")
+        print("❌ Configuration errors:")
         for error in errors:
             print(f"  - {error}")
         return
     
     print_config()
     
-    # Utilise les paramètres de la configuration
+    # Use configuration parameters
     tickers = TICKERS
     start_date = START_DATE
     end_date = END_DATE

@@ -128,36 +128,36 @@ def load_regularization_results(ticker):
 def print_header():
     """Print header."""
     print("\n" + "="*100)
-    print("RESULTATS COMPLETS - STRATEGIES DE TRADING")
+    print("📊 COMPLETE RESULTS - TRADING STRATEGIES")
     print("="*100)
-    print(f"\nConfiguration actuelle:")
+    print(f"\nCurrent configuration:")
     print(f"   * Tickers: {', '.join(TICKERS)}")
     print(f"   * Benchmark: {BENCHMARK_TICKER}")
-    print(f"   * Periode: {START_DATE} -> {END_DATE}")
+    print(f"   * Period: {START_DATE} -> {END_DATE}")
     print("="*100)
 
 def print_main_comparison(results):
     """Print main comparison of 4 methods."""
     
     if not results:
-        print("\nWARNING:  Aucun resultat trouve")
+        print("\nWARNING:  No results found")
         return
     
     print("\n" + "="*100)
-    print(" COMPARAISON DES 4 METHODES")
+    print("📊 COMPARISON OF 4 METHODS")
     print("="*100)
-    print("\nCette comparaison montre:")
-    print("  1.  Buy & Hold - Benchmark passif (acheter et garder)")
-    print("  2.  Meilleure BIAISEE (look-ahead) - Performance artificielle")
-    print("  3.  Walk-Forward (SANS biais) - Performance realiste")
-    print("  4.  Machine Learning - Selection automatique")
+    print("\nThis comparison shows:")
+    print("  1.  Buy & Hold - Passive benchmark (buy and hold)")
+    print("  2.  Best BIASED (look-ahead) - Artificial performance")
+    print("  3.  Walk-Forward (NO bias) - Realistic performance")
+    print("  4.  Machine Learning - Automatic selection")
     print("\n" + "="*100)
     
     for r in results:
         ticker = r['ticker']
         print(f"\n {ticker}")
         print("-"*100)
-        print(f"{'Methode':<35} {'CAGR':>10} {'Sharpe':>10} {'Max DD':>10}")
+        print(f"{'Method':<35} {'CAGR':>10} {'Sharpe':>10} {'Max DD':>10}")
         print("-"*100)
         
         # Buy & Hold
@@ -178,44 +178,44 @@ def print_main_comparison(results):
         
         # Performance gaps
         print("\n" + "="*100)
-        print(" Ecarts vs Buy & Hold:")
+        print("📊 Differences vs Buy & Hold:")
         diff_biased_vs_bh = biased['cagr'] - bh['cagr']
         diff_wf_vs_bh = wf['cagr'] - bh['cagr']
         diff_ml_vs_bh = ml['cagr'] - bh['cagr']
         
         print(f"   * Best Biased vs B&H:      {diff_biased_vs_bh:+.2f}% {'[UP]' if diff_biased_vs_bh > 0 else '[DOWN]'}")
-        print(f"   * Walk-Forward vs B&H:     {diff_wf_vs_bh:+.2f}% {'�' if diff_wf_vs_bh > 0 else '[DOWN]'}")
+        print(f"   * Walk-Forward vs B&H:     {diff_wf_vs_bh:+.2f}% {'[UP]' if diff_wf_vs_bh > 0 else '[DOWN]'}")
         print(f"   * ML vs B&H:               {diff_ml_vs_bh:+.2f}% {'[UP]' if diff_ml_vs_bh > 0 else '[DOWN]'}")
         
-        print("\n Ecarts de performance:")
+        print("\n📊 Performance differences:")
         diff_biased_vs_wf = biased['cagr'] - wf['cagr']
         diff_ml_vs_wf = ml['cagr'] - wf['cagr']
         
-        print(f"   * Biais du look-ahead:     {abs(diff_biased_vs_wf):.2f}% {'�' if diff_biased_vs_wf < 0 else '[OK]'}")
-        print(f"   * ML vs Walk-Forward:      {diff_ml_vs_wf:+.2f}% {'[UP]' if diff_ml_vs_wf > 0 else '[DOWN]'}")
+        print(f"   * Look-ahead bias:         {abs(diff_biased_vs_wf):.2f}% {'⚠️' if diff_biased_vs_wf < 0 else '✅[OK]'}")
+        print(f"   * ML vs Walk-Forward:      {diff_ml_vs_wf:+.2f}% {'⬆️[UP]' if diff_ml_vs_wf > 0 else '⬇️[DOWN]'}")
         print("="*100)
 
 def print_summary(results):
     """Print overall summary."""
     
     print("\n" + "="*100)
-    print(" RESUME & INTERPRETATION")
+    print("📊 SUMMARY & INTERPRETATION")
     print("="*100)
     
-    print("\n� BUY & HOLD:")
-    print("   Strategie passive - acheter et garder. Benchmark de reference.")
+    print("\n💰 BUY & HOLD:")
+    print("   Passive strategy - buy and hold. Reference benchmark.")
     
-    print("\n�[DOWN] BIAIS DU LOOK-AHEAD:")
-    print("   La 'meilleure stratégie biaisée' utilise des infos du futur.")
-    print("   C'est comme tricher en regardant les réponses!")
+    print("\n⚠️[DOWN] LOOK-AHEAD BIAS:")
+    print("   The 'best biased strategy' uses future information.")
+    print("   It's like cheating by looking at the answers!")
     
-    print("\n[OK] WALK-FORWARD (SANS BIAIS):")
-    print("   Selection basée sur le passé, testée sur le futur.")
-    print("   C'est la performance RÉALISTE que vous auriez obtenue.")
+    print("\n✅[OK] WALK-FORWARD (NO BIAS):")
+    print("   Selection based on the past, tested on the future.")
+    print("   This is the REALISTIC performance you would have obtained.")
     
-    print("\n MACHINE LEARNING:")
-    print("   Le ML sélectionne automatiquement les meilleures MA pairs")
-    print("   en utilisant 21 features (prix, volume, momentum, SPY, etc.).")
+    print("\n🤖 MACHINE LEARNING:")
+    print("   ML automatically selects the best MA pairs")
+    print("   using 21 features (price, volume, momentum, SPY, etc.).")
     
     # Calculate averages only if there are results
     if len(results) > 0:
@@ -224,7 +224,7 @@ def print_summary(results):
         avg_wf = sum(r['walk_forward']['cagr'] for r in results) / len(results)
         avg_ml = sum(r['ml']['cagr'] for r in results) / len(results)
         
-        print("\n MOYENNES SUR TOUS LES TICKERS:")
+        print("\n📊 AVERAGES ACROSS ALL TICKERS:")
         print(f"   1.  Buy & Hold:           {avg_bh:>8.2f}% CAGR")
         print(f"   2.  Biased (look-ahead):  {avg_biased:>8.2f}% CAGR")
         print(f"   3.  Walk-Forward:         {avg_wf:>8.2f}% CAGR")
@@ -232,8 +232,8 @@ def print_summary(results):
         
         improvement_vs_wf = avg_ml - avg_wf
         improvement_vs_bh = avg_ml - avg_bh
-        print(f"\n   [UP] Amélioration ML vs Walk-Forward: {improvement_vs_wf:+.2f}% CAGR")
-        print(f"   [UP] Amélioration ML vs Buy & Hold:   {improvement_vs_bh:+.2f}% CAGR")
+        print(f"\n   ⬆️[UP] ML Improvement vs Walk-Forward: {improvement_vs_wf:+.2f}% CAGR")
+        print(f"   ⬆️[UP] ML Improvement vs Buy & Hold:   {improvement_vs_bh:+.2f}% CAGR")
     
     print("="*100)
 
@@ -241,11 +241,11 @@ def print_regularization_results(results):
     """Print regularization analysis results."""
     
     if not results:
-        print("\nWARNING:  Aucune analyse de régularisation trouvee")
+        print("\nWARNING:  No regularization analysis found")
         return
     
     print("\n" + "="*100)
-    print(" ANALYSE DE RÉGULARISATION (Lasso)")
+    print("📊 REGULARIZATION ANALYSIS (Lasso)")
     print("="*100)
     print(f"\n{'Ticker':<10} {'Alpha optimal':<15} {'Test R²':<12} {'Train R²':<12} {'Features':<12}")
     print("-"*100)
@@ -262,12 +262,12 @@ def print_files_location():
     """Print where to find detailed results."""
     
     print("\n" + "="*100)
-    print(" FICHIERS DE RESULTATS DÉTAILLÉS")
+    print("📁 DETAILED RESULTS FILES")
     print("="*100)
-    print("\n Strategie Traditionnelle:")
+    print("\n📈 Traditional Strategy:")
     print("   * Backtests:      data/SRC/results/backtest/")
     print("   * Walk-forward:   data/SRC/results/variations/")
-    print("   * Graphiques:     data/SRC/results/variations/*_equity_curves.png")
+    print("   * Charts:         data/SRC/results/variations/*_equity_curves.png")
     
     print("\n Machine Learning:")
     print("   * Datasets ML:    data/ML/TICKER_ml_data.csv")
@@ -503,7 +503,7 @@ def save_all_tables(combined_results, reg_results):
     tables_dir.mkdir(parents=True, exist_ok=True)
     
     print("\n" + "="*100)
-    print(" CRÉATION DES TABLEAUX POUR LE RAPPORT ACADÉMIQUE")
+    print("📊 CREATING TABLES FOR ACADEMIC REPORT")
     print("="*100)
     
     # Table 1: Overall Performance
@@ -624,7 +624,7 @@ def main():
     print_files_location()
     
     print("\n" + "="*100)
-    print("[OK] Résumé complet affiché et tableaux sauvegardes!")
+    print("✅[OK] Complete summary displayed and tables saved!")
     print("="*100 + "\n")
 
 if __name__ == '__main__':

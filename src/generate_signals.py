@@ -2,13 +2,13 @@
 Generate Trading Signals from Moving Averages
 ==============================================
 
-Ce script utilise la configuration centralisée pour :
-1. Lire les fichiers avec moyennes mobiles
-2. Générer les signaux selon les comparaisons configurées
-3. Créer un signal combiné et un signal d'achat
-4. Sauvegarder dans le dossier configuré
+This script uses centralized configuration to:
+1. Read files with moving averages
+2. Generate signals according to configured comparisons
+3. Create a combined signal and a buy signal
+4. Save to configured directory
 
-Les paramètres sont définis dans project_config.py
+Parameters are defined in project_config.py
 """
 
 import pandas as pd
@@ -17,18 +17,18 @@ from pathlib import Path
 import sys
 import os
 
-# Importer la configuration
+# Import configuration
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from project_config import MA_COMPARISONS, DATA_PROCESSED_DIR
 
 
 def generate_signals(input_file, output_folder=None):
     """
-    Génère les signaux de trading selon la configuration.
+    Generates trading signals according to configuration.
     
     Args:
-        input_file: Chemin vers le fichier CSV avec moyennes mobiles
-        output_folder: Dossier de sortie (utilise STRATEGY_DIR si None)
+        input_file: Path to CSV file with moving averages
+        output_folder: Output directory (uses STRATEGY_DIR if None)
     """
     if output_folder is None:
         output_folder = DATA_PROCESSED_DIR
@@ -37,8 +37,8 @@ def generate_signals(input_file, output_folder=None):
     print(f"Reading {input_file.name}...")
     df = pd.read_csv(input_file)
     
-    # Utilise les comparaisons configurées
-    # Convertit le format dict en tuple pour compatibilité
+    # Use configured comparisons
+    # Convert dict format to tuple for compatibility
     comparisons = [(comp['short'], comp['long'], comp['name']) for comp in MA_COMPARISONS]
     
     # Generate signals for each comparison
@@ -123,13 +123,13 @@ def generate_signals(input_file, output_folder=None):
 
 
 def main():
-    """Traite tous les fichiers avec moyennes mobiles selon la configuration."""
+    """Processes all files with moving averages according to configuration."""
     from project_config import print_config, validate_config
     
-    # Validation de la configuration
+    # Configuration validation
     is_valid, errors = validate_config()
     if not is_valid:
-        print("❌ Erreurs de configuration :")
+        print("❌ Configuration errors:")
         for error in errors:
             print(f"  - {error}")
         return

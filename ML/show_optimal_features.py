@@ -8,7 +8,7 @@ from pathlib import Path
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import Lasso
 
-# Utilise le dossier racine du projet pour des chemins absolus
+# Use project root directory for absolute paths
 PROJECT_ROOT = Path(__file__).parent.parent.absolute()
 
 # Load the regularization analysis results

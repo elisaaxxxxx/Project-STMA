@@ -4,7 +4,7 @@ from pathlib import Path
 import sys
 import os
 
-# Importer la configuration (maintenant dans le dossier parent)
+# Import configuration (now in parent folder)
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from project_config import ALL_TICKERS, START_DATE, END_DATE, get_data_file_path, print_config, validate_config
 
@@ -16,22 +16,22 @@ class DataLoader:
         self.data = None
     
     def download(self):
-        """Télécharge les données depuis Yahoo Finance"""
+        """Downloads data from Yahoo Finance"""
         print(f"Downloading {self.ticker} from {self.start} to {self.end}...")
         self.data = yf.download(self.ticker, start=self.start, end=self.end)
         return self.data
     
     def validate(self):
-        """Vérifie l'intégrité des données"""
+        """Validates data integrity"""
         assert self.data is not None, "No data loaded"
         assert not self.data.empty, "Empty dataframe"
         
-        # Vérifier les valeurs manquantes
+        # Check for missing values
         missing = self.data.isnull().sum()
         if missing.any():
             print(f"Warning: Missing values detected:\n{missing[missing > 0]}")
         
-        # Vérifier les prix négatifs
+        # Check for negative prices
         assert (self.data[['Open', 'High', 'Low', 'Close']] > 0).all().all(), \
                "Negative prices detected"
         
@@ -39,10 +39,10 @@ class DataLoader:
         return True
     
     def save(self, path=None):
-        """Sauvegarde les données dans le répertoire configuré.
+        """Saves data to the configured directory.
 
-        Nettoie les en-têtes multi-index produits par yfinance et écrit un
-        CSV simple avec une seule ligne d'en-tête : Date,Open,High,Low,Close,Volume.
+        Cleans multi-index headers produced by yfinance and writes a
+        simple CSV with a single header line: Date,Open,High,Low,Close,Volume.
         """
         if path is None:
             from project_config import DATA_RAW_DIR
@@ -52,54 +52,54 @@ class DataLoader:
         filename = f"{self.ticker}_{self.start}_{self.end}.csv"
         filepath = target / filename
 
-        # Préparer une copie nettoyée du dataframe :
+        # Prepare a cleaned copy of the dataframe:
         df_clean = self.data.copy()
-        # Remettre l'index en colonne 'Date'
+        # Reset index to 'Date' column
         try:
             df_clean = df_clean.reset_index()
-            # Formater la colonne Date pour n'avoir que la date (sans l'heure)
+            # Format Date column to have only the date (without time)
             if 'Date' in df_clean.columns:
                 df_clean['Date'] = pd.to_datetime(df_clean['Date']).dt.strftime('%Y-%m-%d')
         except Exception:
-            # si reset_index échoue, on continue avec l'original
+            # if reset_index fails, continue with the original
             pass
 
-        # Aplatir les colonnes MultiIndex si présent
+        # Flatten MultiIndex columns if present
         if hasattr(df_clean.columns, 'levels') and getattr(df_clean.columns, 'nlevels', 1) > 1:
             new_cols = {}
             for col in df_clean.columns:
                 if isinstance(col, tuple):
-                    # Cherche un label utile (Open/High/Low/Close/Adj Close/Volume)
+                    # Look for a useful label (Open/High/Low/Close/Adj Close/Volume)
                     chosen = None
                     for part in col:
                         if isinstance(part, str) and part.strip() in ('Open', 'High', 'Low', 'Close', 'Adj Close', 'Volume'):
                             chosen = part.strip()
                             break
                     if chosen is None:
-                        # fallback : joindre les parties non vides
+                        # fallback: join non-empty parts
                         chosen = '_'.join([str(p) for p in col if p])
                     new_cols[col] = chosen
                 else:
                     new_cols[col] = col
             df_clean = df_clean.rename(columns=new_cols)
 
-        # Si 'Adj Close' existe mais pas 'Close', on renomme
+        # If 'Adj Close' exists but not 'Close', rename it
         if 'Adj Close' in df_clean.columns and 'Close' not in df_clean.columns:
             df_clean = df_clean.rename(columns={'Adj Close': 'Close'})
 
-        # Sélectionner colonnes dans l'ordre souhaité si elles existent
+        # Select columns in desired order if they exist
         desired = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume']
         existing = [c for c in desired if c in df_clean.columns]
-        # S'assurer que 'Date' est la première colonne
+        # Ensure 'Date' is the first column
         if 'Date' in existing:
             df_to_save = df_clean[['Date'] + [c for c in existing if c != 'Date']]
         else:
-            # fallback : sauvegarder tout avec index False
+            # fallback: save everything with index False
             df_to_save = df_clean
 
-        # Sauvegarder sans index ni multi-en-têtes
-        # Écrire un CSV simple avec un seul en-tête : Date,Open,High,Low,Close,Volume
-        # S'assurer que les colonnes existent et dans le bon ordre
+        # Save without index or multi-headers
+        # Write a simple CSV with a single header: Date,Open,High,Low,Close,Volume
+        # Ensure columns exist and are in the correct order
         desired = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume']
         existing = [c for c in desired if c in df_clean.columns]
         if 'Date' in df_clean.columns and 'Date' not in existing:
@@ -110,34 +110,34 @@ class DataLoader:
         else:
             cols_to_write = list(df_clean.columns)
 
-        # Construire un DataFrame propre avec exactement les colonnes désirées
-        # en cherchant les meilleures correspondances dans df_clean
+        # Build a clean DataFrame with exactly the desired columns
+        # by finding the best matches in df_clean
         out_cols = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume']
         rows = []
         for col in out_cols:
-            # trouver une colonne candidate dans df_clean
+            # find a candidate column in df_clean
             candidates = [c for c in df_clean.columns if str(c).lower() == col.lower()]
             if not candidates:
-                # heuristique : match partiel
+                # heuristic: partial match
                 candidates = [c for c in df_clean.columns if col.lower() in str(c).lower()]
             if candidates:
-                # prendre la première correspondance
+                # take the first match
                 rows.append(candidates[0])
             else:
                 rows.append(None)
 
-        # Construire DataFrame final colonne par colonne
+        # Build final DataFrame column by column
         import csv
         with open(filepath, 'w', encoding='utf-8', newline='') as fh:
             writer = csv.writer(fh)
-            # écrire l'en-tête fixe
+            # write fixed header
             writer.writerow(out_cols)
-            # écrire les lignes de données
-            # déterminer nombre de lignes
+            # write data rows
+            # determine number of rows
             if 'Date' in df_clean.columns:
                 nrows = len(df_clean)
             else:
-                # si Date était l'index initial
+                # if Date was the initial index
                 nrows = len(df_clean)
 
             for i in range(nrows):
@@ -159,8 +159,8 @@ def _parse_args():
     """Parse CLI arguments for quick use from the command line."""
     import argparse
     
-    # Récupérer les valeurs actuelles de la configuration (après rechargement éventuel)
-    current_tickers = ','.join(ALL_TICKERS)  # Inclut TICKERS + BENCHMARK
+    # Get current configuration values (after potential reload)
+    current_tickers = ','.join(ALL_TICKERS)  # Includes TICKERS + BENCHMARK
     current_start = START_DATE
     current_end = END_DATE
 
@@ -177,17 +177,17 @@ def _parse_args():
 
 
 if __name__ == '__main__':
-    # Force reload de la configuration pour éviter les problèmes de cache
+    # Force reload configuration to avoid cache issues
     import importlib
     if 'project_config' in sys.modules:
         importlib.reload(sys.modules['project_config'])
-        # Re-importer les variables après rechargement
+        # Re-import variables after reload
         from project_config import ALL_TICKERS, START_DATE, END_DATE, get_data_file_path, print_config, validate_config
     
-    # Valider la configuration
+    # Validate configuration
     is_valid, errors = validate_config()
     if not is_valid:
-        print("❌ Erreurs de configuration :")
+        print("❌ Configuration errors:")
         for error in errors:
             print(f"  - {error}")
         exit(1)

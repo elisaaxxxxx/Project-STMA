@@ -1,129 +1,129 @@
 """
-Configuration centralisée pour le projet de stratégie de trading
-================================================================
+Centralized configuration for the trading strategy project
+===========================================================
 
-Modifiez les valeurs ci-dessous pour changer les tickers, dates, 
-et autres paramètres du projet.
+Modify the values below to change tickers, dates, 
+and other project parameters.
 
-Tous les scripts utiliseront automatiquement ces paramètres.
+All scripts will automatically use these parameters.
 """
 
-# ===== TICKERS À ANALYSER =====
-# Tickers à trader (changez cette liste selon vos besoins)
+# ===== TICKERS TO ANALYZE =====
+# Tickers to trade (change this list according to your needs)
 TICKERS = [
-    # Tech (meilleurs performers ML)
+    # Tech (best ML performers)
     'AAPL',   # 📱 Apple - ML +2.19% vs B&H
     'NVDA',   # 🎮 Nvidia - ML +21.49% vs B&H
     
-    # Finance (stable, prévisible)
-    'JPM',    # 🏦 JP Morgan - Banque leader
+    # Finance (stable, predictable)
+    'JPM',    # 🏦 JP Morgan - Leading bank
     'BAC',    # 🏦 Bank of America
     
-    # Consumer Staples (défensif, stable)
+    # Consumer Staples (defensive, stable)
     'PG',     # 🧼 Procter & Gamble - Consumer goods
     'KO',     # 🥤 Coca-Cola - Beverages
     
-    # Healthcare (croissance stable)
-    'JNJ',    # � Johnson & Johnson - Pharma
+    # Healthcare (stable growth)
+    'JNJ',    # 💊 Johnson & Johnson - Pharma
 ]
 
-# SPY comme benchmark uniquement (pour features ML)
-BENCHMARK_TICKER = 'SPY'  # 📊 S&P 500 ETF - Benchmark uniquement
+# SPY as benchmark only (for ML features)
+BENCHMARK_TICKER = 'SPY'  # 📊 S&P 500 ETF - Benchmark only
 
-# Liste complète (tickers + benchmark) pour téléchargement des données
+# Complete list (tickers + benchmark) for data download
 ALL_TICKERS = TICKERS + [BENCHMARK_TICKER]
 
-# Caractéristiques de chaque ticker:
-# - AAPL: Tech leader, forte croissance, high volatility
-# - NVDA: Semiconducteur, très forte croissance, très volatile (AI boom)
-# - JPM: Banque, cyclique, corrélé aux taux d'intérêt
-# - JNJ:  Pharma/Healthcare, défensif, faible volatilité
-# - XOM:  Énergie, cyclique, corrélé au pétrole
+# Characteristics of each ticker:
+# - AAPL: Tech leader, strong growth, high volatility
+# - NVDA: Semiconductor, very strong growth, very volatile (AI boom)
+# - JPM: Bank, cyclical, correlated with interest rates
+# - JNJ: Pharma/Healthcare, defensive, low volatility
+# - XOM: Energy, cyclical, correlated with oil
 
-# Note: SPY est utilisé uniquement comme BENCHMARK (dans les features ML)
-# mais n'est PAS tradé directement
+# Note: SPY is used only as BENCHMARK (in ML features)
+# but is NOT traded directly
 
-# Exemples d'autres tickers intéressants à tester :
-# Actions tech (FAANG+) :
+# Examples of other interesting tickers to test:
+# Tech stocks (FAANG+):
 # TICKERS = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'NVDA', 'TSLA', ]
 
-# ETFs diversifiés :
+# Diversified ETFs:
 # TICKERS = ['SPY', 'QQQ', 'IWM', 'VTI', 'DIA', 'EFA', 'VWO']
 
-# Secteurs spécifiques :
-# TICKERS = ['XLE', 'XLF', 'XLK', 'XLV', 'XLI']  # Énergie, Finance, Tech, Santé, Industrie
+# Specific sectors:
+# TICKERS = ['XLE', 'XLF', 'XLK', 'XLV', 'XLI']  # Energy, Finance, Tech, Health, Industry
 
-# Matières premières :
-# TICKERS = ['GLD', 'SLV', 'USO', 'UNG', 'DBA']  # Or, Argent, Pétrole, Gaz, Agriculture
+# Commodities:
+# TICKERS = ['GLD', 'SLV', 'USO', 'UNG', 'DBA']  # Gold, Silver, Oil, Gas, Agriculture
 
-# Actions défensives :
+# Defensive stocks:
 # TICKERS = ['JNJ', 'PG', 'KO', 'WMT', 'PFE']  # Consumer staples & healthcare
 
-# Crypto (si supporté par yfinance) :
+# Crypto (if supported by yfinance):
 # TICKERS = ['BTC-USD', 'ETH-USD']
 
-# ===== PÉRIODE D'ANALYSE =====
-# Format: 'AAAA-MM-JJ'
+# ===== ANALYSIS PERIOD =====
+# Format: 'YYYY-MM-DD'
 START_DATE = '2000-01-01'
-END_DATE = '2025-11-01'  # Jusqu'au 1er novembre 2025
+END_DATE = '2025-11-01'  # Until November 1st, 2025
 
-# Exemples d'autres périodes :
-# START_DATE = '2020-01-01'  # Dernières 5 années
-# START_DATE = '2010-01-01'  # Dernières 15 années
-# END_DATE = '2024-12-31'    # Jusqu'à fin 2024
+# Examples of other periods:
+# START_DATE = '2020-01-01'  # Last 5 years
+# START_DATE = '2010-01-01'  # Last 15 years
+# END_DATE = '2024-12-31'    # Until end of 2024
 
-# ===== PARAMÈTRES DES MOYENNES MOBILES =====
-# Périodes des moyennes mobiles à calculer
+# ===== MOVING AVERAGES PARAMETERS =====
+# Moving average periods to calculate
 MA_PERIODS = [5, 10, 20, 50, 100, 200]
 
-# Comparaisons pour générer les signaux (court terme vs long terme)
+# Comparisons to generate signals (short term vs long term)
 MA_COMPARISONS = [
-    {'short': 5, 'long': 20, 'name': 'Signal_5_20_short'},      # Court terme
-    {'short': 10, 'long': 50, 'name': 'Signal_10_50_medium'},   # Moyen terme  
-    {'short': 20, 'long': 100, 'name': 'Signal_20_100_long'},   # Long terme
-    {'short': 50, 'long': 200, 'name': 'Signal_50_200_vlong'}   # Très long terme
+    {'short': 5, 'long': 20, 'name': 'Signal_5_20_short'},      # Short term
+    {'short': 10, 'long': 50, 'name': 'Signal_10_50_medium'},   # Medium term  
+    {'short': 20, 'long': 100, 'name': 'Signal_20_100_long'},   # Long term
+    {'short': 50, 'long': 200, 'name': 'Signal_50_200_vlong'}   # Very long term
 ]
 
-# ===== PARAMÈTRES DE BACKTEST =====
-# Coût de transaction par trade (en pourcentage)
-TRANSACTION_COST = 0.001  # 0.1% par transaction
+# ===== BACKTEST PARAMETERS =====
+# Transaction cost per trade (in percentage)
+TRANSACTION_COST = 0.001  # 0.1% per transaction
 
-# Nombre de jours de trading par an (pour l'annualisation)
+# Number of trading days per year (for annualization)
 TRADING_DAYS_PER_YEAR = 252
 
-# ===== PARAMÈTRES WALK-FORWARD =====
-# Période d'entraînement en mois
-TRAINING_MONTHS = 36  # 3 ans
+# ===== WALK-FORWARD PARAMETERS =====
+# Training period in months
+TRAINING_MONTHS = 36  # 3 years
 
-# Période de test en mois
-TEST_MONTHS = 6  # 6 mois
+# Test period in months
+TEST_MONTHS = 6  # 6 months
 
-# ===== RÉPERTOIRES =====
-# Utilise des chemins ABSOLUS basés sur l'emplacement de ce fichier
-# Cela garantit que les données sont toujours créées au bon endroit,
-# peu importe d'où on lance le script
+# ===== DIRECTORIES =====
+# Use ABSOLUTE paths based on this file's location
+# This ensures data is always created in the right place,
+# regardless of where the script is launched from
 import os
 from pathlib import Path
 
-# Trouve le dossier racine du projet (là où se trouve ce fichier)
+# Find the project root directory (where this file is located)
 PROJECT_ROOT = Path(__file__).parent.absolute()
 
-# Structure organisée : SRC pour pipeline traditionnel, ML pour machine learning
-DATA_RAW_DIR = str(PROJECT_ROOT / 'data' / 'SRC' / 'raw')                    # Données brutes (CSV téléchargés)
-DATA_PROCESSED_DIR = str(PROJECT_ROOT / 'data' / 'SRC' / 'processed')        # Données avec MA et signaux  
-RESULTS_BACKTEST_DIR = str(PROJECT_ROOT / 'data' / 'SRC' / 'results' / 'backtest')     # Résultats des backtests
-RESULTS_VARIATIONS_DIR = str(PROJECT_ROOT / 'data' / 'SRC' / 'results' / 'variations')  # Tests de variations
+# Organized structure: SRC for traditional pipeline, ML for machine learning
+DATA_RAW_DIR = str(PROJECT_ROOT / 'data' / 'SRC' / 'raw')                    # Raw data (downloaded CSVs)
+DATA_PROCESSED_DIR = str(PROJECT_ROOT / 'data' / 'SRC' / 'processed')        # Data with MA and signals  
+RESULTS_BACKTEST_DIR = str(PROJECT_ROOT / 'data' / 'SRC' / 'results' / 'backtest')     # Backtest results
+RESULTS_VARIATIONS_DIR = str(PROJECT_ROOT / 'data' / 'SRC' / 'results' / 'variations')  # Variation tests
 
-# Anciens noms pour compatibilité (DEPRECATED)
+# Old names for compatibility (DEPRECATED)
 DATA_DIR = DATA_RAW_DIR
 STRATEGY_DIR = DATA_PROCESSED_DIR
 RESULTS_DIR = RESULTS_BACKTEST_DIR
 VARIATIONS_DIR = RESULTS_VARIATIONS_DIR
 
-# ===== FONCTIONS UTILITAIRES =====
+# ===== UTILITY FUNCTIONS =====
 
 def get_data_file_path(ticker, start_date=None, end_date=None):
-    """Génère le chemin vers le fichier de données brutes."""
+    """Generates path to raw data file."""
     if start_date is None:
         start_date = START_DATE
     if end_date is None:
@@ -131,7 +131,7 @@ def get_data_file_path(ticker, start_date=None, end_date=None):
     return f"{DATA_RAW_DIR}/{ticker}_{start_date}_{end_date}.csv"
 
 def get_ma_file_path(ticker, start_date=None, end_date=None):
-    """Génère le chemin vers le fichier avec moyennes mobiles."""
+    """Generates path to file with moving averages."""
     if start_date is None:
         start_date = START_DATE
     if end_date is None:
@@ -139,7 +139,7 @@ def get_ma_file_path(ticker, start_date=None, end_date=None):
     return f"{DATA_PROCESSED_DIR}/{ticker}_{start_date}_{end_date}_with_MAs.csv"
 
 def get_signals_file_path(ticker, start_date=None, end_date=None):
-    """Génère le chemin vers le fichier avec signaux."""
+    """Generates path to file with signals."""
     if start_date is None:
         start_date = START_DATE
     if end_date is None:
@@ -147,7 +147,7 @@ def get_signals_file_path(ticker, start_date=None, end_date=None):
     return f"{DATA_PROCESSED_DIR}/{ticker}_{start_date}_{end_date}_with_signals.csv"
 
 def get_backtest_file_path(ticker, start_date=None, end_date=None):
-    """Génère le chemin vers le fichier de résultats de backtest."""
+    """Generates path to backtest results file."""
     if start_date is None:
         start_date = START_DATE
     if end_date is None:
@@ -155,148 +155,148 @@ def get_backtest_file_path(ticker, start_date=None, end_date=None):
     return f"{RESULTS_BACKTEST_DIR}/{ticker}_{start_date}_{end_date}_backtest_results.csv"
 
 def print_config():
-    """Affiche la configuration actuelle."""
+    """Displays current configuration."""
     print("=" * 60)
-    print("CONFIGURATION DU PROJET")
+    print("PROJECT CONFIGURATION")
     print("=" * 60)
     print(f"Tickers: {TICKERS}")
-    print(f"Période: {START_DATE} à {END_DATE}")
-    print(f"Moyennes mobiles: {MA_PERIODS}")
-    print(f"Coût de transaction: {TRANSACTION_COST:.4f}")
-    print(f"Walk-Forward: {TRAINING_MONTHS} mois training, {TEST_MONTHS} mois test")
+    print(f"Period: {START_DATE} to {END_DATE}")
+    print(f"Moving averages: {MA_PERIODS}")
+    print(f"Transaction cost: {TRANSACTION_COST:.4f}")
+    print(f"Walk-Forward: {TRAINING_MONTHS} months training, {TEST_MONTHS} months test")
     print("=" * 60)
 
 def validate_config():
-    """Valide la configuration."""
+    """Validates configuration."""
     errors = []
     
     if not TICKERS:
-        errors.append("TICKERS ne peut pas être vide")
+        errors.append("TICKERS cannot be empty")
     
     try:
         from datetime import datetime
         start_dt = datetime.strptime(START_DATE, '%Y-%m-%d')
         end_dt = datetime.strptime(END_DATE, '%Y-%m-%d')
         if start_dt >= end_dt:
-            errors.append("START_DATE doit être antérieure à END_DATE")
+            errors.append("START_DATE must be before END_DATE")
     except ValueError:
-        errors.append("Format de date invalide (utilisez AAAA-MM-JJ)")
+        errors.append("Invalid date format (use YYYY-MM-DD)")
     
     if not MA_PERIODS or not all(isinstance(p, int) and p > 0 for p in MA_PERIODS):
-        errors.append("MA_PERIODS doit contenir des entiers positifs")
+        errors.append("MA_PERIODS must contain positive integers")
     
     if not (0 <= TRANSACTION_COST <= 1):
-        errors.append("TRANSACTION_COST doit être entre 0 et 1")
+        errors.append("TRANSACTION_COST must be between 0 and 1")
     
     return len(errors) == 0, errors
 
-# ===== FONCTIONS DE GESTION DE CONFIGURATION =====
+# ===== CONFIGURATION MANAGEMENT FUNCTIONS =====
 
 def update_tickers(new_tickers):
-    """Met à jour la liste des tickers dans le fichier de configuration."""
+    """Updates the list of tickers in the configuration file."""
     import os
     import shutil
     
-    print(f"🔄 Mise à jour des tickers: {new_tickers}")
+    print(f"🔄 Updating tickers: {new_tickers}")
     
-    # Lire le fichier
+    # Read the file
     with open('project_config.py', 'r') as f:
         content = f.read()
     
-    # Construire la nouvelle ligne TICKERS
+    # Build the new TICKERS line
     tickers_list = [f"'{ticker.strip()}'" for ticker in new_tickers]
     new_tickers_line = f"TICKERS = [{', '.join(tickers_list)}]"
     
-    # Remplacer la ligne TICKERS
+    # Replace the TICKERS line
     lines = content.split('\n')
     for i, line in enumerate(lines):
         if line.strip().startswith('TICKERS = [') and not line.strip().startswith('#'):
             lines[i] = new_tickers_line
             break
     
-    # Sauvegarder
+    # Save
     with open('project_config.py', 'w') as f:
         f.write('\n'.join(lines))
     
-    # Nettoyer le cache
+    # Clear cache
     clear_cache()
     
-    # Vérifier quelles données manquent et proposer le téléchargement
+    # Check which data is missing and propose download
     check_and_download_missing_data(new_tickers)
     
-    print("✅ Tickers mis à jour!")
+    print("✅ Tickers updated!")
 
 def check_and_download_missing_data(tickers):
-    """Vérifie et télécharge automatiquement les données manquantes."""
+    """Checks and automatically downloads missing data."""
     import os
     import sys
     from pathlib import Path
     
     missing_tickers = []
     
-    # Vérifier quels fichiers manquent
+    # Check which files are missing
     for ticker in tickers:
         data_file = f"data/raw/{ticker}_{START_DATE}_{END_DATE}.csv"
         if not os.path.exists(data_file):
             missing_tickers.append(ticker)
     
     if missing_tickers:
-        print(f"\n📥 Données manquantes pour: {', '.join(missing_tickers)}")
-        print("🔄 Téléchargement automatique en cours...")
+        print(f"\n📥 Missing data for: {', '.join(missing_tickers)}")
+        print("🔄 Automatic download in progress...")
         
         try:
-            # Lancer le data_loader via subprocess pour éviter les problèmes d'import
+            # Launch data_loader via subprocess to avoid import issues
             import subprocess
             result = subprocess.run([
                 sys.executable, 'src/data_loader.py'
             ], cwd='.', capture_output=True, text=True)
             
             if result.returncode == 0:
-                print("✅ Données téléchargées avec succès!")
+                print("✅ Data downloaded successfully!")
                 
-                # Traitement automatique complet pour les nouvelles données
-                print("🔄 Traitement automatique des nouvelles données...")
+                # Complete automatic processing for new data
+                print("🔄 Automatic processing of new data...")
                 
-                # Calcul des moyennes mobiles
+                # Calculate moving averages
                 ma_result = subprocess.run([
                     sys.executable, 'run_pipeline.py', '--ma'
                 ], cwd='.', capture_output=True, text=True)
                 
                 if ma_result.returncode == 0:
-                    print("✅ Moyennes mobiles calculées!")
+                    print("✅ Moving averages calculated!")
                     
-                    # Génération des signaux
+                    # Generate signals
                     signals_result = subprocess.run([
                         sys.executable, 'run_pipeline.py', '--signals'
                     ], cwd='.', capture_output=True, text=True)
                     
                     if signals_result.returncode == 0:
-                        print("✅ Signaux générés!")
-                        print("🎉 Nouvelles données complètement traitées!")
+                        print("✅ Signals generated!")
+                        print("🎉 New data completely processed!")
                     else:
-                        print("⚠️  Erreur génération signaux, mais données téléchargées")
+                        print("⚠️  Error generating signals, but data downloaded")
                 else:
-                    print("⚠️  Erreur calcul MA, mais données téléchargées")
+                    print("⚠️  Error calculating MA, but data downloaded")
                     
             else:
-                print(f"❌ Erreur lors du téléchargement: {result.stderr}")
-                print("💡 Vous pouvez télécharger manuellement avec: python src/data_loader.py")
+                print(f"❌ Error during download: {result.stderr}")
+                print("💡 You can download manually with: python src/data_loader.py")
             
         except Exception as e:
-            print(f"❌ Erreur lors du téléchargement: {e}")
-            print("💡 Vous pouvez télécharger manuellement avec: python src/data_loader.py")
+            print(f"❌ Error during download: {e}")
+            print("💡 You can download manually with: python src/data_loader.py")
     else:
-        print("✅ Toutes les données sont disponibles!")
+        print("✅ All data is available!")
 
 def update_dates(start_date, end_date):
-    """Met à jour les dates dans le fichier de configuration."""
-    print(f"🔄 Mise à jour des dates: {start_date} → {end_date}")
+    """Updates dates in the configuration file."""
+    print(f"🔄 Updating dates: {start_date} → {end_date}")
     
-    # Lire le fichier
+    # Read the file
     with open('project_config.py', 'r') as f:
         content = f.read()
     
-    # Remplacer les dates
+    # Replace dates
     lines = content.split('\n')
     for i, line in enumerate(lines):
         if line.strip().startswith('START_DATE = ') and not line.strip().startswith('#'):
@@ -304,87 +304,87 @@ def update_dates(start_date, end_date):
         elif line.strip().startswith('END_DATE = ') and not line.strip().startswith('#'):
             lines[i] = f"END_DATE = '{end_date}'"
     
-    # Sauvegarder
+    # Save
     with open('project_config.py', 'w') as f:
         f.write('\n'.join(lines))
     
-    # Nettoyer le cache
+    # Clear cache
     clear_cache()
-    print("✅ Dates mises à jour!")
+    print("✅ Dates updated!")
 
 def clear_cache():
-    """Nettoie les caches Python pour forcer le rechargement."""
+    """Clears Python caches to force reload."""
     import os
     import shutil
     import sys
     
-    print("🧹 Nettoyage des caches Python...")
+    print("🧹 Cleaning Python caches...")
     
-    # Supprimer __pycache__
+    # Delete __pycache__
     cache_dirs = ['__pycache__', 'src/__pycache__']
     for cache_dir in cache_dirs:
         if os.path.exists(cache_dir):
             shutil.rmtree(cache_dir)
-            print(f"   Supprimé: {cache_dir}")
+            print(f"   Deleted: {cache_dir}")
     
-    # Supprimer le module des modules chargés
+    # Remove module from loaded modules
     if 'project_config' in sys.modules:
         del sys.modules['project_config']
-        print("   Module project_config rechargé")
+        print("   Module project_config reloaded")
 
 def manage_config():
-    """Interface interactive pour gérer la configuration."""
+    """Interactive interface to manage configuration."""
     import sys
     
     if len(sys.argv) == 1:
-        # Mode interactif
-        print("\n🎛️  GESTIONNAIRE DE CONFIGURATION")
+        # Interactive mode
+        print("\n🎛️  CONFIGURATION MANAGER")
         print("="*50)
-        print("1. Afficher la configuration actuelle")
-        print("2. Modifier les tickers")
-        print("3. Modifier les dates")
-        print("4. Nettoyer les caches")
-        print("5. Quitter")
+        print("1. Display current configuration")
+        print("2. Modify tickers")
+        print("3. Modify dates")
+        print("4. Clear caches")
+        print("5. Quit")
         
         while True:
             try:
-                choice = input("\nChoisissez une option (1-5): ").strip()
+                choice = input("\nChoose an option (1-5): ").strip()
                 
                 if choice == '1':
                     print_config()
                 elif choice == '2':
                     current_tickers = ', '.join(TICKERS)
-                    print(f"Tickers actuels: {current_tickers}")
-                    new_tickers = input("Nouveaux tickers (séparés par virgules): ").strip()
+                    print(f"Current tickers: {current_tickers}")
+                    new_tickers = input("New tickers (separated by commas): ").strip()
                     if new_tickers:
                         tickers = [t.strip().upper() for t in new_tickers.split(',')]
                         update_tickers(tickers)
                 elif choice == '3':
-                    print(f"Dates actuelles: {START_DATE} → {END_DATE}")
-                    start = input("Nouvelle date de début (AAAA-MM-JJ): ").strip()
-                    end = input("Nouvelle date de fin (AAAA-MM-JJ): ").strip()
+                    print(f"Current dates: {START_DATE} → {END_DATE}")
+                    start = input("New start date (YYYY-MM-DD): ").strip()
+                    end = input("New end date (YYYY-MM-DD): ").strip()
                     if start and end:
                         update_dates(start, end)
                 elif choice == '4':
                     clear_cache()
                 elif choice == '5':
-                    print("Au revoir!")
+                    print("Goodbye!")
                     break
                 else:
-                    print("❌ Option invalide, choisissez 1-5")
+                    print("❌ Invalid option, choose 1-5")
             
             except KeyboardInterrupt:
-                print("\n\nAu revoir!")
+                print("\n\nGoodbye!")
                 break
     else:
-        # Mode ligne de commande
+        # Command line mode
         import argparse
         
-        parser = argparse.ArgumentParser(description="Gestion de la configuration")
-        parser.add_argument('--show', action='store_true', help='Affiche la configuration')
-        parser.add_argument('--tickers', type=str, help='Nouveaux tickers (ex: AAPL,MSFT,SPY)')
-        parser.add_argument('--dates', nargs=2, help='Nouvelles dates (START END)')
-        parser.add_argument('--clear', action='store_true', help='Nettoie les caches')
+        parser = argparse.ArgumentParser(description="Configuration management")
+        parser.add_argument('--show', action='store_true', help='Display configuration')
+        parser.add_argument('--tickers', type=str, help='New tickers (ex: AAPL,MSFT,SPY)')
+        parser.add_argument('--dates', nargs=2, help='New dates (START END)')
+        parser.add_argument('--clear', action='store_true', help='Clear caches')
         
         args = parser.parse_args()
         
@@ -398,6 +398,6 @@ def manage_config():
         if args.clear:
             clear_cache()
 
-# Validation automatique à l'import
+# Automatic validation on import
 if __name__ == "__main__":
     manage_config()

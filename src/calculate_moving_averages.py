@@ -2,12 +2,12 @@
 Calculate Moving Averages for Stock Data
 ==========================================
 
-Ce script utilise la configuration centralisée pour :
-1. Lire les fichiers CSV configurés
-2. Calculer les moyennes mobiles selon les périodes configurées
-3. Sauvegarder dans le dossier configuré
+This script uses centralized configuration to:
+1. Read configured CSV files
+2. Calculate moving averages according to configured periods
+3. Save to configured directory
 
-Les paramètres sont définis dans project_config.py
+Parameters are defined in project_config.py
 """
 
 import pandas as pd
@@ -15,18 +15,18 @@ from pathlib import Path
 import sys
 import os
 
-# Importer la configuration
+# Import configuration
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from project_config import MA_PERIODS, DATA_PROCESSED_DIR, get_ma_file_path
 
 
 def calculate_moving_averages(input_file, output_folder=None):
     """
-    Calcule les moyennes mobiles selon la configuration.
+    Calculates moving averages according to configuration.
     
     Args:
-        input_file: Chemin vers le fichier CSV avec les données
-        output_folder: Dossier de sortie (utilise STRATEGY_DIR si None)
+        input_file: Path to CSV file with data
+        output_folder: Output directory (uses STRATEGY_DIR if None)
     """
     if output_folder is None:
         output_folder = DATA_PROCESSED_DIR
@@ -35,7 +35,7 @@ def calculate_moving_averages(input_file, output_folder=None):
     print(f"Reading {input_file.name}...")
     df = pd.read_csv(input_file)
     
-    # Utilise les périodes de MA configurées
+    # Use configured MA periods
     windows = MA_PERIODS
     
     # Calculate moving average for each window
@@ -59,13 +59,13 @@ def calculate_moving_averages(input_file, output_folder=None):
 
 
 def main():
-    """Traite tous les fichiers CSV selon la configuration."""
+    """Processes all CSV files according to configuration."""
     from project_config import DATA_RAW_DIR, print_config, validate_config
     
-    # Validation de la configuration
+    # Configuration validation
     is_valid, errors = validate_config()
     if not is_valid:
-        print("❌ Erreurs de configuration :")
+        print("❌ Configuration errors:")
         for error in errors:
             print(f"  - {error}")
         return

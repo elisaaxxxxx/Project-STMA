@@ -26,7 +26,7 @@ warnings.filterwarnings('ignore')
 sys.path.append(str(Path(__file__).parent.parent))
 import project_config as config
 
-# Utilise le dossier racine du projet pour des chemins absolus
+# Use project root directory for absolute paths
 PROJECT_ROOT = Path(__file__).parent.parent.absolute()
 DATA_PROCESSED_DIR = PROJECT_ROOT / "data" / "SRC" / "processed"
 ML_DATA_DIR = PROJECT_ROOT / "data" / "ML"
