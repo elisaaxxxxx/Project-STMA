@@ -2,8 +2,54 @@
 """
 Signal Variations Analysis Report Generator
 
-This script generates a comprehensive report analyzing the results from test_signal_variations.py
-It compares walk-forward analysis with traditional strategies across all tickers.
+PURPOSE:
+This script generates comprehensive performance reports comparing different trading strategies.
+It analyzes results from multiple signal variations and walks-forward analysis to identify
+which strategies perform best across different market conditions and tickers.
+
+KEY CONCEPTS:
+- Signal Variation: Different combinations of technical indicators (MA crossovers, RSI, etc.)
+- Walk-Forward Analysis: Out-of-sample testing by training on one period, testing on future data
+- Traditional Strategy: Using fixed parameters across the entire time period
+- Performance Comparison: Evaluating strategies based on CAGR, Sharpe ratio, drawdown, etc.
+
+WHAT THIS SCRIPT DOES:
+1. Loads backtest results from all signal variations and tickers
+2. Calculates aggregate performance statistics (mean, median, std deviation)
+3. Compares walk-forward vs traditional approaches
+4. Generates visualizations (heatmaps, bar charts, equity curves)
+5. Creates summary tables ranking strategies by performance
+6. Exports comprehensive PDF/HTML report
+
+ANALYSIS COMPONENTS:
+- Performance Metrics: CAGR, Volatility, Sharpe Ratio, Max Drawdown
+- Statistical Tests: Mean returns, consistency across tickers
+- Visual Comparisons: Side-by-side equity curves, performance heatmaps
+- Strategy Rankings: Best/worst performing variations
+
+INPUT:
+CSV files from data/results/variations/ containing backtest results:
+- Walk-forward analysis results (trained on subset, tested on future data)
+- Traditional strategy results (fixed parameters throughout)
+Each file contains: Date, Returns, Equity, Signals, Metrics
+
+OUTPUT:
+- Summary tables (CSV): Strategy rankings and aggregate statistics
+- Visualizations (PNG): Heatmaps, bar charts, equity curves comparison
+- Comprehensive report (HTML/PDF): Full analysis with commentary
+All saved to data/results/variations/reports/
+
+WORKFLOW:
+1. Load all variation results from CSV files
+2. Aggregate metrics across tickers
+3. Compute summary statistics (mean, median, std)
+4. Generate comparison plots
+5. Create ranking tables
+6. Export final report with all findings
+
+USE CASE:
+After running test_signal_variations.py to test different strategies,
+use this script to identify which approach works best for your trading system.
 """
 
 import pandas as pd

@@ -1,13 +1,101 @@
 #!/usr/bin/env python3
 """
-Test different signal combination strategies to find optimal performance.
+Test Signal Variations: Walk-Forward Analysis of Traditional MA Strategies
+===========================================================================
 
-This script uses centralized configuration to:
-- Test different MA signal combinations
-- Perform walk-forward analysis to avoid look-ahead bias
-- Compare performance with different strategies
+WHAT THIS SCRIPT DOES:
+This is the MOST CRITICAL file for evaluating traditional moving average strategies.
+It tests 10 different rule combinations and uses walk-forward analysis to prevent
+look-ahead bias, providing realistic performance estimates.
 
-Parameters are defined in project_config.py
+THE PROBLEM: LOOK-AHEAD BIAS
+Traditional backtesting suffers from hindsight bias: testing all strategies on the
+full dataset and picking the best one means you're "cheating" by seeing the future.
+This inflates performance metrics and leads to unrealistic expectations.
+
+THE SOLUTION: WALK-FORWARD ANALYSIS
+Walk-forward methodology eliminates bias by using only past data for decisions:
+
+ALGORITHM:
+1. Use 36 months (3 years) of training data
+2. Test all 10 strategy combinations on this training period
+3. Select the BEST performing strategy (by Sharpe ratio)
+4. Apply ONLY that strategy to the next 6 months (test period)
+5. Roll forward 6 months and repeat steps 1-4
+
+This simulates REAL TRADING: you can only use historical data to make decisions.
+
+THE 10 STRATEGY COMBINATIONS TESTED:
+Based on 4 fixed MA pairs: (5,20), (10,50), (20,100), (50,200)
+These create 4 binary signals: Signal_5_20_short, Signal_10_50_medium, 
+                               Signal_20_100_long, Signal_50_200_vlong
+
+1. "Original (≥2/4)":          At least 2 signals bullish (majority rule)
+2. "Short only (5,20)":        Use only short-term MA signal
+3. "Medium only (10,50)":      Use only medium-term MA signal
+4. "Long only (20,100)":       Use only long-term MA signal
+5. "Very Long only (50,200)":  Use only very long-term MA signal
+6. "Short OR Long":            Either short OR long signal bullish
+7. "Short AND Medium":         Both short AND medium signals bullish
+8. "Long AND Very Long":       Both long AND very long signals bullish
+9. "At least 3 (≥3/4)":        At least 3 signals bullish (strong consensus)
+10. "All signals (=4/4)":      All 4 signals bullish (very strong consensus)
+
+WALK-FORWARD EXAMPLE (AAPL):
+Period 1: Train 2000-2003 (36m) → Select "Short OR Long" → Test 2003-2003.5 (6m)
+Period 2: Train 2000.5-2003.5 (36m) → Select "All 4 signals" → Test 2003.5-2004 (6m)
+Period 3: Train 2001-2004 (36m) → Select "≥2/4" → Test 2004-2004.5 (6m)
+...and so on, rolling forward every 6 months
+
+Result: A realistic equity curve that switches strategies based on what worked historically.
+
+TWO ANALYSES PERFORMED:
+1. **WALK-FORWARD (NO BIAS)**: Realistic performance using only past data
+   - Output metric: "Walk-Forward (Clean)" CAGR, Sharpe, MaxDD
+   - This is the REAL expected performance
+
+2. **TRADITIONAL (WITH BIAS)**: Tests all 10 strategies on full dataset, picks best
+   - Output metric: "Best Traditional" CAGR, Sharpe, MaxDD
+   - This is INFLATED by hindsight - shows theoretical maximum
+   - Useful to quantify the cost of avoiding bias
+
+TYPICAL RESULTS (AAPL):
+- Buy & Hold:           25.10% CAGR (benchmark)
+- Best Traditional:     27.78% CAGR (biased - picked "Short OR Long" with hindsight)
+- Walk-Forward:         20.92% CAGR (realistic - no bias)
+- Difference:           -6.86% (cost of eliminating bias)
+
+The walk-forward result (20.92%) is what you'd actually achieve in real trading.
+The traditional result (27.78%) is what you'd get if you had a time machine.
+
+OUTPUT FILES:
+1. {ticker}_walk_forward_detailed.csv       - Performance metrics for each 6-month period
+2. {ticker}_strategy_selections.csv         - Which strategy was selected each period
+3. {ticker}_traditional_comparison.csv      - Full dataset results (biased)
+4. {ticker}_signal_variations_comparison.csv - Summary comparing all methods
+5. {ticker}_signal_variations_equity_curves.png - Visual comparison
+
+KEY METRICS CALCULATED:
+- CAGR: Compound Annual Growth Rate
+- Sharpe Ratio: Risk-adjusted returns (higher is better)
+- Max Drawdown: Largest peak-to-trough decline
+- Volatility: Annualized standard deviation of returns
+- Total Trades: Number of position changes
+- Transaction Costs: 0.1% per trade (0.001 in decimal)
+
+CONFIGURATION:
+All parameters are defined in project_config.py:
+- TICKERS: List of stocks to test
+- START_DATE, END_DATE: Testing period
+- TRANSACTION_COST: Cost per trade (default 0.001 = 0.1%)
+- TRADING_DAYS_PER_YEAR: Used for annualization (default 252)
+
+USAGE:
+Run standalone: python src/test_signal_variations.py
+Or via pipeline: python main.py --traditional
+
+This script is essential for comparing traditional strategies against the ML approach
+and demonstrating the value (or cost) of eliminating look-ahead bias.
 """
 
 import pandas as pd

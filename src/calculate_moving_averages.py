@@ -1,13 +1,48 @@
 """
-Calculate Moving Averages for Stock Data
-==========================================
+Calculate Moving Averages for Technical Analysis
 
-This script uses centralized configuration to:
-1. Read configured CSV files
-2. Calculate moving averages according to configured periods
-3. Save to configured directory
+PURPOSE:
+This script computes Simple Moving Averages (SMA) for stock price data.
+Moving averages smooth out price data to identify trends and are commonly used
+in technical trading strategies (e.g., crossover strategies, support/resistance).
 
-Parameters are defined in project_config.py
+KEY CONCEPTS:
+- Simple Moving Average (SMA): Average closing price over a specified window
+  Example: 50-day MA = average of last 50 closing prices
+- Multiple Windows: Script calculates several MAs simultaneously (e.g., 20, 50, 200 days)
+- Rolling Calculation: MA is recalculated daily as new data arrives
+
+TECHNICAL DETAILS:
+The formula for SMA is:
+    SMA(n) = (Price₁ + Price₂ + ... + Priceₙ) / n
+Where n is the window period (e.g., 20 days, 50 days, 200 days)
+
+WORKFLOW:
+1. Load raw price data from CSV (Date, Open, High, Low, Close, Volume)
+2. For each configured period (e.g., [20, 50, 200]):
+   - Calculate rolling mean of closing prices
+   - Store as new column (e.g., 'MA_20', 'MA_50', 'MA_200')
+3. Save enhanced DataFrame to processed data directory
+
+COMMON MOVING AVERAGE PERIODS:
+- Short-term: 10, 20 days (reacts quickly to price changes)
+- Medium-term: 50 days (balance between responsiveness and stability)
+- Long-term: 100, 200 days (identifies major trends)
+
+INPUT:
+Raw CSV files from data/raw/ with columns: Date, Open, High, Low, Close, Volume
+
+OUTPUT:
+Enhanced CSV files in data/processed/ with additional MA columns:
+Date, Open, High, Low, Close, Volume, MA_20, MA_50, MA_200 (example)
+
+CONFIGURATION:
+- MA_PERIODS: List of periods defined in project_config.py
+- DATA_PROCESSED_DIR: Output directory path from configuration
+
+USAGE:
+Can be run standalone or imported as a module:
+    python calculate_moving_averages.py
 """
 
 import pandas as pd

@@ -2,13 +2,61 @@
 Generate Trading Signals from Moving Averages
 ==============================================
 
-This script uses centralized configuration to:
-1. Read files with moving averages
-2. Generate signals according to configured comparisons
-3. Create a combined signal and a buy signal
-4. Save to configured directory
+WHAT THIS SCRIPT DOES:
+This script transforms moving average data into actionable trading signals by comparing
+short-term and long-term moving averages to identify bullish/bearish market conditions.
 
-Parameters are defined in project_config.py
+CORE CONCEPT - MOVING AVERAGE CROSSOVER STRATEGY:
+When a short-term MA (e.g., MA_5) crosses above a long-term MA (e.g., MA_20), it indicates
+upward momentum → Bullish Signal (1)
+When a short-term MA crosses below or equals a long-term MA → Bearish Signal (0)
+
+SIGNAL GENERATION PROCESS:
+1. Reads CSV files with pre-calculated moving averages (output from calculate_moving_averages.py)
+2. Creates 4 binary signals based on MA pair comparisons:
+   - Signal_5_20_short:   MA_5 vs MA_20   (short-term trend)
+   - Signal_10_50_medium: MA_10 vs MA_50  (medium-term trend)
+   - Signal_20_100_long:  MA_20 vs MA_100 (long-term trend)
+   - Signal_50_200_vlong: MA_50 vs MA_200 (very long-term trend)
+
+3. Creates Combined_Signal: String representation of all 4 signals (e.g., "1010", "1111", "0000")
+   - "1111" = All 4 MAs bullish (strong uptrend)
+   - "0000" = All 4 MAs bearish (strong downtrend)
+   - "1010" = Mixed signals (uncertain market)
+
+4. Creates Buy signal: Simplified decision rule
+   - Buy = 1 if ≥2 signals are bullish (majority rule)
+   - Buy = 0 if <2 signals bullish (stay out)
+   - Buy = NA if insufficient data (early period with incomplete MAs)
+
+TECHNICAL IMPLEMENTATION:
+- Signal = 1 if MA_short > MA_long, else 0
+- Handles missing values (NA) properly during early period when long-term MAs are still forming
+- Uses pandas Int64 type to support integer values with NA (nullable integers)
+- Preserves all original columns from input file
+
+INPUT FILES:
+- Reads from: data/SRC/processed/*_with_MAs.csv
+- Expected columns: Date, Open, High, Low, Close, Volume, MA_5, MA_10, MA_20, MA_50, MA_100, MA_200
+
+OUTPUT FILES:
+- Saves to: data/SRC/processed/*_with_signals.csv
+- New columns added: Signal_5_20_short, Signal_10_50_medium, Signal_20_100_long, 
+                     Signal_50_200_vlong, Combined_Signal, Buy
+
+CONFIGURATION:
+All parameters (MA pairs, file paths) are defined in project_config.py for centralized control.
+
+USAGE:
+Run standalone: python src/generate_signals.py
+Or via pipeline: python main.py --traditional
+
+EXAMPLE OUTPUT:
+  Signal_5_20_short:   523 bullish / 301 bearish (of 824 total)
+  Combined_Signal Distribution:
+    1111: 412 occurrences (all bullish)
+    0000: 198 occurrences (all bearish)
+    1010: 89 occurrences (mixed)
 """
 
 import pandas as pd

@@ -26,7 +26,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 
 # 4. Install dependencies
-pip install -r Environment/environment_pip.txt
+pip install -r requirements.txt
 
 # 5. Run the complete pipeline
 python3 main.py --all
@@ -44,7 +44,7 @@ python3 show_results.py
 
 ```bash
 # Create environment from YAML file
-conda env create -f Environment/environment.yml
+conda env create -f environment.yml
 
 # Activate environment
 conda activate trading-ml-project

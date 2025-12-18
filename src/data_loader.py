@@ -1,3 +1,31 @@
+"""
+Data Loader Module - Downloads and saves financial market data from Yahoo Finance
+
+PURPOSE:
+This module provides the DataLoader class for fetching historical stock price data.
+It handles the complete workflow: download → validate → clean → save to CSV.
+
+KEY FEATURES:
+- Downloads OHLCV data (Open, High, Low, Close, Volume) using yfinance API
+- Validates data quality (checks for missing values, negative prices)
+- Cleans messy multi-index columns that yfinance sometimes produces
+- Saves standardized CSV files with format: Date,Open,High,Low,Close,Volume
+- Can be used as a library (import DataLoader) or run as a script (python data_loader.py)
+
+USAGE AS SCRIPT:
+    python data_loader.py --ticker AAPL --start 2020-01-01 --end 2023-12-31
+
+USAGE AS MODULE:
+    from data_loader import DataLoader
+    loader = DataLoader(ticker='AAPL', start='2020-01-01', end='2023-12-31')
+    loader.download()
+    loader.validate()
+    loader.save()
+
+OUTPUT:
+Creates CSV files in data/raw/ directory with clean, standardized format.
+"""
+
 import yfinance as yf
 import pandas as pd
 from pathlib import Path
