@@ -65,16 +65,16 @@ This project implements and compares **4 different trading approaches**:
 4. **Machine Learning (Lasso)** - Automated MA pair selection using ML
 
 **Key Results** (Average across 7 diversified tickers):
-- **ML Strategy: 27.49% CAGR** (best overall)
-- Buy & Hold: 25.85% CAGR
-- Best Biased: 22.40% CAGR
-- Walk-Forward: 19.39% CAGR
+- **ML Strategy: 16.22% CAGR** (best overall)
+- Buy & Hold: 14.03% CAGR
+- Best Biased: 11.64% CAGR
+- Walk-Forward: 9.52% CAGR
 
 **Main Findings:**
-- ML outperforms walk-forward by **+6.69% CAGR** on average
+- ML outperforms walk-forward by **+6.70% CAGR** on average
 - ML achieves **+2.19% CAGR** improvement vs Buy & Hold
 - ML shows better risk-adjusted returns (higher Sharpe ratios)
-- Performance varies by sector: exceptional on tech (NVDA +21.49%), challenging on stable stocks (KO -10.41%)
+- Performance varies by sector: exceptional on tech (NVDA +22.17% vs walk-forward), challenging on stable stocks (KO -3.95%)
 
 ---
 
@@ -115,11 +115,21 @@ Project/
 │   │       ├──  backtest/                  # Backtest results
 │   │       └──  variations/                # Walk-forward test results
 │   │
-│   └──  ML/                                #  ML training data
-│       ├── AAPL_ml_data.csv                  # ML dataset (75K+ rows)
-│       ├──  backtest_results/              # ML strategy backtest results
-│       ├──  regularization_analysis/       # Lasso α tuning results & plots
-│       └── ... (other tickers)
+│   ├──  ML/                                #  ML training data
+│   │   ├── AAPL_ml_data.csv                  # ML dataset (75K+ rows)
+│   │   ├──  backtest_results/              # ML strategy backtest results
+│   │   ├──  regularization_analysis/       # Lasso α tuning results & plots
+│   │   └── ... (other tickers)
+│   │
+│   └──  tables_for_report/                 # 📊 Academic Tables (8 CSV files)
+│       ├── table1_overall_performance_averages.csv
+│       ├── table2_cagr_by_ticker_individual_results.csv
+│       ├── table3_sharpe_by_ticker_individual_results.csv
+│       ├── table4_ml_metrics_averages.csv
+│       ├── table5_economic_significance_AAPL_example.csv
+│       ├── table6_feature_importance_AAPL_example.csv
+│       ├── table7_model_comparison_AAPL_example.csv
+│       └── table8_transaction_cost_impact_averages.csv
 │
 ├──  project_config.py                      # CENTRAL CONFIGURATION
 ├──  main.py                                # AUTOMATED PIPELINE (Traditional + ML)
@@ -138,7 +148,7 @@ Edit `project_config.py`:
 ```python
 # Tickers to trade
 TICKERS = [
-    'AAPL',   # Apple
+    'AAPL',   # Apple (⚠️ REQUIRED - used as illustrative example in Tables 5-7)
     'NVDA',   # Nvidia
     'JPM',    # JP Morgan
     'BAC',    # Bank of America
@@ -154,6 +164,13 @@ BENCHMARK_TICKER = 'SPY'
 START_DATE = '2000-01-01'
 END_DATE = '2025-11-01'
 ```
+
+> **⚠️ Important:** **AAPL must be included** in your ticker list. It serves as the illustrative example for:
+> - **Table 5**: Economic Significance (terminal wealth calculation)
+> - **Table 6**: Feature Importance (Lasso feature selection)
+> - **Table 7**: Model Comparison (5 models performance)
+>
+> These tables dynamically load AAPL's actual results. You can add or remove other tickers, but AAPL is required.
 
 ### Step 2: **Run Complete Pipeline**
 
@@ -187,6 +204,31 @@ python show_results.py
 -  ML vs Buy & Hold comparisons
 -  Regularization analysis (optimal α, features selected)
 -  File locations for detailed results
+
+### Step 4: **Academic Tables Generated**
+
+The pipeline automatically generates **8 CSV tables** in `data/tables_for_report/` for your research report:
+
+**Tables with AVERAGES (across all 7 tickers):**
+- `table1_overall_performance_averages.csv` - Compares 4 strategies (CAGR, Sharpe, Max DD)
+- `table4_ml_metrics_averages.csv` - ML model quality (R², RMSE, MAE, feature counts)
+- `table8_transaction_cost_impact_averages.csv` - Performance with vs without 0.1% costs
+
+**Tables with INDIVIDUAL RESULTS (one row per ticker):**
+- `table2_cagr_by_ticker_individual_results.csv` - CAGR for each ticker
+- `table3_sharpe_by_ticker_individual_results.csv` - Sharpe ratio for each ticker
+
+**Tables with AAPL EXAMPLES (illustrative case study):**
+- `table5_economic_significance_AAPL_example.csv` - Terminal wealth ($100 investment)
+- `table6_feature_importance_AAPL_example.csv` - Which features Lasso selected (2 features)
+- `table7_model_comparison_AAPL_example.csv` - Lasso vs other models (R², feature counts)
+
+> **📊 Note:** Tables 5, 6, 7 use AAPL as a detailed illustrative example to demonstrate:
+> - Economic significance (dollar impact)
+> - Feature selection process (which of 21 features matter)
+> - Model comparison (why Lasso wins)
+>
+> These tables dynamically load AAPL's actual results, so **AAPL must be in your ticker list**.
 
 ---
 
@@ -394,18 +436,18 @@ ML (Lasso)              16.22%        NVDA (56.42%)    KO (-3.95%)
 ```
 Ticker   Optimal α    Test R²    Train R²   Features   Performance
 ────────────────────────────────────────────────────────────────────
-AAPL     9.10e-04     1.07%      0.87%      3/21       Excellent [YES]
-NVDA     5.18e-04     0.89%      0.55%      8/21       Exceptional [YES]
-JPM      1.21e-03     0.55%      1.24%      6/21       Good [YES]
+AAPL     9.10e-04     1.07%      0.91%      2/21       Excellent ✅
+NVDA     5.18e-04     0.89%      0.55%      8/21       Exceptional ✅
+JPM      1.21e-03     0.55%      1.24%      6/21       Good ✅
 BAC      3.73e-03     0.13%      0.29%      1/21       Difficult 
-PG       3.91e-04     0.37%      0.37%      3/21       Very Good [YES]
+PG       3.91e-04     0.37%      0.37%      3/21       Very Good ✅
 KO       5.18e-04     0.21%      0.24%      4/21       Challenging 
 JNJ      3.91e-04     0.35%      0.78%      6/21       Moderate 
 ```
 
 **Key Insights:**
--  **R² ranges 0.13% - 1.07%**: Low but normal for financial data
-- - **No overfitting**: Test R² ≈ Train R² (good generalization)
+- ✅ **R² ranges 0.13% - 1.07%**: Low but normal for financial data
+- ✅ **No overfitting**: Test R² ≈ Train R² (good generalization)
 -  **Feature selection**: Models use 1-8 features (out of 21)
 -  **Best predictability**: AAPL (1.07%), NVDA (0.89%), JPM (0.55%)
 -  **Harder to predict**: BAC (0.13%), KO (0.21%), JNJ (0.35%)
@@ -618,63 +660,55 @@ This analysis tests 50 different regularization strengths (α from 10⁻⁴ to 1
 🏆 OPTIMAL MODEL FOUND
 ================================================================================
 
-Regularization Strength (α):    7.20e-04
-Test R²:                         0.0112  (1.12%)
-Train R²:                        0.0093  (0.93%)
-Overfitting Gap:                -0.0018  (NEGATIVE = NO OVERFITTING [YES])
-Features Selected:               4 / 21  (automatic feature selection)
-Test RMSE:                       0.0325
-Test MAE:                        0.0238
+Regularization Strength (α):    9.10e-04
+Test R²:                         0.0107  (1.07%)
+Train R²:                        0.0091  (0.91%)
+Overfitting Gap:                -0.0016  (NEGATIVE = NO OVERFITTING ✅)
+Features Selected:               2 / 21  (automatic feature selection)
+Test RMSE:                       0.0327
+Test MAE:                        0.0239
 
 EXTREMES:
 ─────────────────────────────────────────────────────────────────────────
-• Too Little Regularization (α=1e-04):  Test R² = -16.6%  (severe overfitting!)
+• Too Little Regularization (α=1e-05):  Test R² = -26.2%  (severe overfitting!)
 • Too Much Regularization (α=1e+02):    Test R² = -0.03%  (all features removed)
-• Optimal Balance (α=7.2e-04):          Test R² = +1.12%  (best generalization)
+• Optimal Balance (α=9.1e-04):          Test R² = +1.07%  (best generalization)
 ```
 
 **Key Findings:**
 
-1. ** Bias-Variance Tradeoff Visualized:**
-   - **Left side (low α)**: High variance → Model uses 13 features → Overfits training data → Test R² = -16.6%
-   - **Sweet spot (α=7.2e-04)**: Optimal balance → Model uses 4 features → Best generalization → Test R² = +1.12%
+1. **✅ Bias-Variance Tradeoff Visualized:**
+   - **Left side (low α)**: High variance → Model uses 20 features → Overfits training data → Test R² = -26.2%
+   - **Sweet spot (α=9.1e-04)**: Optimal balance → Model uses 2 features → Best generalization → Test R² = +1.07%
    - **Right side (high α)**: High bias → Model uses 0 features → Underfits → Test R² = -0.03%
 
-2. **- No Overfitting at Optimal α:**
-   - Train R² (0.93%) < Test R² (1.12%)
+2. **✅ No Overfitting at Optimal α:**
+   - Train R² (0.91%) < Test R² (1.07%)
    - Negative overfitting gap confirms model generalizes well
 
-3. **Automatic Feature Selection - The 4 Selected Features:**
+3. **Automatic Feature Selection - The 2 Selected Features:**
    
-   Lasso reduces features from 21 → 4 automatically, keeping only the most predictive variables.
+   Lasso reduces features from 21 → 2 automatically, keeping only the most predictive variables.
    
    **Selected Features (Ranked by Importance):**
    
-   1. **`signal_t`** (MA-Specific) — Coefficient: **+0.002893**
+   1. **`signal_t`** (MA-Specific) — Coefficient: **+0.002721**
       - Current trading signal (-1, 0, +1)
-      - Most important feature: 5× larger coefficient than others
+      - Most important feature: 5.6× larger coefficient than the other
    
-   2. **`spy_ret_20d`** (Market) — Coefficient: +0.000593
+   2. **`spy_ret_20d`** (Market) — Coefficient: +0.000487
       - SPY 20-day return
       - Captures market regime (bull/bear context)
    
-   3. **`ma_short_t`** (MA-Specific) — Coefficient: -0.000201
-      - Short moving average value at time t
-      - Negative sign suggests mean reversion effect
-   
-   4. **`spy_ret_5d`** (Market) — Coefficient: +0.000134
-      - SPY 5-day return
-      - Short-term market momentum indicator
-   
    **Key Insights:**
-   - Signal dominates: `signal_t` is the most predictive feature
-   - Market context matters: Both SPY features selected (market regime + momentum)
-   - 17 features eliminated: All volatility, volume, and MA parameters dropped
-   - Simplicity wins: 4 carefully selected features outperform using all 21
+   - Signal dominates: `signal_t` is the most predictive feature by far
+   - Market context matters: SPY 20-day return provides bull/bear regime information
+   - 19 features eliminated: All volatility, volume, momentum, and MA parameters dropped
+   - Extreme simplicity wins: Only 2 carefully selected features outperform using all 21
 
-4. ** 4-Panel Visualization Shows:**
+4. **✅ 4-Panel Visualization Shows:**
    - **Top-Left**: R² vs α (main plot showing peak at optimal α)
-   - **Top-Right**: Number of features vs α (drops from 13 → 4 → 0)
+   - **Top-Right**: Number of features vs α (drops from 20 → 2 → 0)
    - **Bottom-Left**: RMSE vs α (prediction error across regularization strengths)
    - **Bottom-Right**: Overfitting gap (train R² - test R²)
 
@@ -695,9 +729,9 @@ EXTREMES:
 
 ##  Key Insights
 
-### - What Works
-1. **ML outperforms** traditional strategies on average (+1.65% vs Buy & Hold)
-2. **Feature selection matters**: Lasso automatically picks 1-9 most relevant features
+### ✅ What Works
+1. **ML outperforms** traditional strategies on average (+2.19% vs Buy & Hold)
+2. **Feature selection matters**: Lasso automatically picks 2-9 most relevant features (e.g., AAPL uses only 2)
 3. **Diversification helps**: Best results with mix of sectors (tech, finance, consumer)
 4. **Lower volatility stocks** may benefit more from ML (more predictable)
 

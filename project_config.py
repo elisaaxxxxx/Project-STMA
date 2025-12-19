@@ -1,11 +1,92 @@
 """
-Centralized configuration for the trading strategy project
-===========================================================
+CENTRALIZED CONFIGURATION - ML-Enhanced Trading Strategy Project
+================================================================
 
-Modify the values below to change tickers, dates, 
-and other project parameters.
+WHAT THIS FILE DOES:
+-------------------
+This is the central configuration file that defines all parameters for the entire research project.
+Every script in the pipeline (main.py, data_loader.py, all ML scripts, etc.) imports settings 
+from this file, ensuring consistency across the entire codebase.
 
-All scripts will automatically use these parameters.
+HOW IT WORKS:
+------------
+When you modify values in this file, ALL scripts automatically use the new settings:
+
+1. TICKERS list → Determines which stocks to analyze
+2. START_DATE/END_DATE → Defines the analysis period
+3. MA_PERIODS → Which moving averages to calculate
+4. BENCHMARK_TICKER → What market index to use for comparison (SPY)
+
+WHY THIS CENTRALIZATION MATTERS:
+-------------------------------
+- ✅ Change tickers in ONE place → affects entire pipeline
+- ✅ Modify date range in ONE place → all scripts adjust
+- ✅ Add new MA periods in ONE place → automatically tested
+- ✅ No need to edit 15+ different Python files manually
+- ✅ Prevents inconsistencies between different analysis stages
+
+CURRENT CONFIGURATION SUMMARY:
+-----------------------------
+📊 Tickers to Trade: 7 stocks (AAPL, NVDA, JPM, BAC, PG, KO, JNJ)
+📈 Benchmark: SPY (S&P 500) - used for ML features only, not traded
+📅 Analysis Period: 2000-01-01 to 2025-11-01 (25 years, 11 months)
+📉 Moving Averages: 6 periods tested (5, 10, 20, 50, 100, 200 days)
+🔄 MA Pairs: 4 fixed pairs for traditional + 8 additional for ML = 12 total
+
+TICKER SELECTION RATIONALE:
+--------------------------
+The current 7 tickers provide diversification across sectors:
+- Tech (AAPL, NVDA): High growth, high volatility, sensitive to innovation cycles
+- Finance (JPM, BAC): Cyclical, correlated with interest rates and economy
+- Consumer Staples (PG, KO): Defensive, stable, predictable cash flows
+- Healthcare (JNJ): Stable growth, defensive characteristics
+
+This mix allows testing if ML works across different market conditions and sectors.
+
+⚠️  IMPORTANT: AAPL is REQUIRED in the TICKERS list because Tables 5, 6, and 7 
+   use AAPL as an illustrative example for feature importance and economic significance.
+
+HOW TO MODIFY THIS CONFIGURATION:
+--------------------------------
+1. To test different stocks:
+   - Edit the TICKERS list below
+   - Keep AAPL for Tables 5-7 to work
+   - Run: python main.py --all
+
+2. To change analysis period:
+   - Edit START_DATE and/or END_DATE
+   - Minimum 5+ years recommended for walk-forward validation
+   - Run: python main.py --all
+
+3. To test different MA periods:
+   - Edit MA_PERIODS list (e.g., add 15 or 30 days)
+   - Edit MA_COMPARISONS if needed (traditional 4 pairs)
+   - Edit ML_MA_PAIRS to add new pairs for ML testing
+   - Run: python main.py --all
+
+4. To view current configuration:
+   - Run: python main.py --config
+   - This displays all settings without running the pipeline
+
+USAGE:
+-----
+After modifying this file, run the appropriate pipeline command:
+    python main.py --all          # Full pipeline with new settings
+    python main.py --traditional  # Only traditional strategies
+    python main.py --ml           # Only ML strategy
+    python main.py --config       # Just display current config
+
+All scripts will automatically use these parameters:
+✓ src/data_loader.py
+✓ src/calculate_moving_averages.py
+✓ src/generate_signals.py
+✓ src/test_signal_variations.py
+✓ src/backtest_signal_strategy.py
+✓ ML/create_ml_data.py
+✓ ML/analyze_lasso_regularization.py
+✓ ML/train_regression_model.py
+✓ ML/backtest_ml_strategy.py
+✓ show_results.py
 """
 
 # ===== TICKERS TO ANALYZE =====

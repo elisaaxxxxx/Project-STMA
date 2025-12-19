@@ -1,20 +1,132 @@
 #!/usr/bin/env python3
 """
-Pipeline V2 - Fixed for new folder structure
-============================================
+MAIN PIPELINE - ML-Enhanced Moving Average Trading Strategy
+===========================================================
 
-Folder structure:
+WHAT THIS CODE DOES:
+-------------------
+This is the master orchestration script that coordinates the entire research project.
+It executes both traditional and ML-enhanced trading strategies, compares their performance,
+and generates academic tables for the final report.
+
+RESEARCH QUESTION:
+-----------------
+Can machine learning improve upon traditional walk-forward moving average strategies, 
+and what is the economic significance of the improvement after accounting for transaction costs?
+
+HOW THIS PIPELINE WORKS:
+-----------------------
+The pipeline is divided into two main branches that can run independently or together:
+
+1. TRADITIONAL PIPELINE (--traditional or --all):
+   Step 1: Download stock data (src/data_loader.py)
+           - Downloads historical price data for all tickers from Yahoo Finance
+           - Saves to: data/SRC/raw/
+   
+   Step 2: Calculate moving averages (src/calculate_moving_averages.py)
+           - Computes 4 MA pairs: (5,20), (10,50), (20,100), (50,200)
+           - Saves to: data/SRC/processed/*_with_MAs.csv
+   
+   Step 3: Generate trading signals (src/generate_signals.py)
+           - Creates binary signals (1=bullish, 0=bearish) for each MA pair
+           - Combines into 4-digit signal (e.g., "1111" = all bullish)
+           - Buy signal = at least 2 out of 4 MAs bullish
+           - Saves to: data/SRC/processed/*_with_signals.csv
+   
+   Step 4: Test strategy variations (src/test_signal_variations.py)
+           - Tests 10 different rule combinations (e.g., "at least 2/4", "at least 3/4")
+           - Compares Walk-Forward (no bias) vs Best Traditional (biased)
+           - Walk-Forward: trains on 36 months → tests on 6 months → rolls forward
+           - Saves to: data/SRC/results/variations/
+   
+   Step 5: Backtest best strategy (src/backtest_signal_strategy.py)
+           - Applies best walk-forward strategy to entire period
+           - Accounts for 0.1% transaction costs per trade
+           - Saves to: data/SRC/results/backtest/
+
+2. ML PIPELINE (--ml or --all):
+   Step 1: Create ML training data (ML/create_ml_data.py)
+           - Engineers 21 features in 3 categories:
+             * 14 global features (market conditions, volatility, momentum)
+             * 5 MA-specific features (distance to MA, crossover signals)
+             * 2 MA pair parameters (which MA pair: 5-20, 10-50, etc.)
+           - Creates one row per (date, MA_pair) combination
+           - Expands dataset from ~6,500 rows to ~78,000 rows (12 MA pairs × dates)
+           - Saves to: data/ML/*_ml_data.csv
+   
+   Step 2: Analyze regularization (ML/analyze_lasso_regularization.py)
+           - Tests different values of alpha (regularization strength)
+           - Finds optimal alpha that balances bias vs variance
+           - Creates 4-panel diagnostic plots
+           - Saves analysis to: data/ML/regularization_analysis/
+   
+   Step 3: Train regression model (ML/train_regression_model.py)
+           - Trains 5 models: Linear, Ridge, Lasso, ElasticNet, SGD
+           - Uses walk-forward validation (36m train → 6m test)
+           - Lasso wins due to automatic feature selection (2-3 features from 21)
+           - Low R² (~1%) is NORMAL in finance - we care about economic value, not fit
+           - Saves models to: ML/models/
+   
+   Step 4: Show optimal features (ML/show_optimal_features.py)
+           - Displays which features Lasso selected (non-zero coefficients)
+           - Example for AAPL: signal_t (+0.002721), spy_ret_20d (+0.000487)
+           - Only 2 features needed out of 21 available
+   
+   Step 5: Backtest ML strategy (ML/backtest_ml_strategy.py)
+           - For each day: predicts next-day returns for all 12 MA pairs
+           - Selects the MA pair with highest predicted return
+           - Generates buy/sell signal using that pair's crossover
+           - Dynamically switches between MA pairs as market conditions change
+           - Accounts for 0.1% transaction costs
+           - Saves to: data/ML/backtest_results/
+
+3. RESULTS GENERATION:
+   After both pipelines complete, this script automatically runs show_results.py
+   which generates 8 academic tables:
+   
+   - Table 1: Overall Performance (AVERAGES across 7 tickers)
+   - Table 2: CAGR by Ticker (INDIVIDUAL results per ticker)
+   - Table 3: Sharpe by Ticker (INDIVIDUAL results per ticker)
+   - Table 4: ML Metrics (AVERAGES: R², RMSE, MAE, feature counts)
+   - Table 5: Economic Significance (AAPL EXAMPLE: terminal wealth comparison)
+   - Table 6: Feature Importance (AAPL EXAMPLE: which features selected)
+   - Table 7: Model Comparison (AAPL EXAMPLE: Lasso vs other models)
+   - Table 8: Transaction Cost Impact (AVERAGES: with vs without costs)
+
+
+FOLDER STRUCTURE:
+----------------
 data/
-  ├── raw/          # Downloaded data
-  ├── processed/    # Data with MA and signals
-  ├── results/      # Traditional backtest results
-  └── ML/           # ML data and results
+  ├── SRC/
+  │   ├── raw/                    # Downloaded price data
+  │   ├── processed/              # Data with MAs and signals
+  │   └── results/                # Traditional backtest results
+  ├── ML/                         # ML training data and results
+  │   ├── backtest_results/
+  │   ├── regularization_analysis/
+  │   └── models/
+  └── tables_for_report/          # Academic tables (CSV format)
 
-Usage:
-    python main.py --all          # Complete pipeline
-    python main.py --traditional  # Traditional pipeline
-    python main.py --ml           # ML pipeline
-    python main.py --config       # View config
+USAGE:
+-----
+    python main.py --all          # Run complete pipeline (traditional + ML)
+    python main.py --traditional  # Run only traditional strategies
+    python main.py --ml           # Run only ML strategy
+    python main.py --config       # View current configuration (tickers, dates)
+
+CONFIGURATION:
+-------------
+All parameters are defined in project_config.py:
+- TICKERS: List of stocks to analyze (default: AAPL, NVDA, JPM, BAC, PG, KO, JNJ)
+- START_DATE: Beginning of analysis period (default: 2000-01-01)
+- END_DATE: End of analysis period (default: 2025-11-01)
+- BENCHMARK_TICKER: Market benchmark (default: SPY - S&P 500)
+
+REQUIREMENTS:
+------------
+- AAPL must be in TICKERS list (required for Tables 5, 6, 7 which use AAPL as example)
+- Minimum 5+ years of data for meaningful walk-forward analysis
+- Internet connection for initial data download from Yahoo Finance
 """
 
 import sys
