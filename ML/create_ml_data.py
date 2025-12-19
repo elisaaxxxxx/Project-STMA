@@ -35,7 +35,7 @@ MA pair (5,10) with signal=1 generated 0.023 return over next 3 days (best choic
 
 THE 21 FEATURES - THREE CATEGORIES:
 
-1️⃣ **GLOBAL MARKET FEATURES (14)** - Same for all MA pairs on a given date:
+1️ **GLOBAL MARKET FEATURES (14)** - Same for all MA pairs on a given date:
    Price Returns:
    - ret_1d: 1-day return (momentum signal)
    - ret_5d: 5-day return (short-term trend)
@@ -62,14 +62,14 @@ THE 21 FEATURES - THREE CATEGORIES:
    - spy_ma_ratio_20_50: SPY's MA_20/MA_50 ratio (market regime)
    - spy_autocorr_1d: SPY return autocorrelation (market efficiency)
 
-2️⃣ **MA-SPECIFIC FEATURES (5)** - Different for each MA pair:
+2️ **MA-SPECIFIC FEATURES (5)** - Different for each MA pair:
    - ma_short_t: Short MA value at time t
    - ma_long_t: Long MA value at time t
    - ma_diff_t: ma_short_t - ma_long_t (absolute difference)
    - ma_ratio_t: ma_short_t / ma_long_t (relative difference)
    - signal_t: Current signal (1 if ma_short > ma_long, else 0)
 
-3️⃣ **MA PARAMETERS (2)** - Identifying which pair:
+3️ **MA PARAMETERS (2)** - Identifying which pair:
    - short_window: Short MA period (5, 10, 20, 50, or 100)
    - long_window: Long MA period (10, 20, 50, 100, or 200)
 

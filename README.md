@@ -253,6 +253,27 @@ python main.py
 
 ---
 
+## 🧹 Clean Data and Start Fresh
+
+If you want to delete all generated data and run the pipeline from scratch:
+
+```bash
+# ⚠️ WARNING: This will delete ALL generated result files!
+# Use this when you want to completely restart the analysis
+
+# Delete all data files (keeps folder structure with .gitkeep)
+find data/SRC/raw -type f ! -name '.gitkeep' -delete
+find data/SRC/processed -type f ! -name '.gitkeep' -delete
+find data/SRC/results -type f ! -name '.gitkeep' -delete
+find data/ML -type f ! -name '.gitkeep' -delete
+find data/tables_for_report -type f ! -name '.gitkeep' -delete 2>/dev/null || true
+find ML/models -type f ! -name '.gitkeep' -delete
+
+
+> **💡 Tip:** This approach keeps the folder structure so Git doesn't lose track of the directories, but removes all generated data files. Perfect for starting fresh while maintaining the project structure.
+
+---
+
 ##  Results Interpretation
 
 ###  Understanding the 4 Methods
@@ -387,7 +408,7 @@ ML (Lasso)              16.22%        NVDA (56.42%)    KO (-3.95%)
 -  **ML Strategy**: 16.22% CAGR average (best overall)
 -  **Buy & Hold**: 14.03% CAGR average
 -  **Best Biased**: 11.64% CAGR average
-- Step 4: **Walk-Forward**: 9.52% CAGR average
+-  **Walk-Forward**: 9.52% CAGR average
 
 **ML Performance Analysis:**
 - - **Outperforms in 5/7 tickers**: AAPL, NVDA, JPM, PG (vs B&H)

@@ -19,11 +19,11 @@ When you modify values in this file, ALL scripts automatically use the new setti
 
 WHY THIS CENTRALIZATION MATTERS:
 -------------------------------
-- ✅ Change tickers in ONE place → affects entire pipeline
-- ✅ Modify date range in ONE place → all scripts adjust
-- ✅ Add new MA periods in ONE place → automatically tested
-- ✅ No need to edit 15+ different Python files manually
-- ✅ Prevents inconsistencies between different analysis stages
+- Change tickers in ONE place → affects entire pipeline
+- Modify date range in ONE place → all scripts adjust
+- Add new MA periods in ONE place → automatically tested
+- No need to edit 15+ different Python files manually
+- Prevents inconsistencies between different analysis stages
 
 CURRENT CONFIGURATION SUMMARY:
 -----------------------------
